@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.crypto.blockfolio.Main
+Main-Class: com.crypto.blockfolio.presentation.Main
 

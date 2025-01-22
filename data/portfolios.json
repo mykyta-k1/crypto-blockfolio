@@ -1,0 +1,18 @@
+[
+  {
+    "owner": {
+      "password": "StrongPass123",
+      "createdAt": "22-01-2025 02:16",
+      "portfolios": [],
+      "email": "test@example.com",
+      "username": "testuser",
+      "id": "caa26b06-8c20-4eea-90c6-bd47cf4865dc"
+    },
+    "createdAt": "22-01-2025 02:16",
+    "name": "My Portfolio",
+    "totalValue": 0,
+    "watchlist": [],
+    "transactionsList": [],
+    "id": "3dbbbe73-81ad-4313-ae24-70bf89820750"
+  }
+]

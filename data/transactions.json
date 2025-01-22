@@ -1,0 +1,17 @@
+[
+  {
+    "cryptocurrency": {
+      "balance": 0,
+      "currentPrice": 30000.0,
+      "name": "Bitcoin",
+      "count": 0.0,
+      "id": "91babf8b-60a9-4c7e-905f-d71d03782f4d"
+    },
+    "transactionType": "BUY",
+    "costs": 60000.0,
+    "fees": 50.0,
+    "description": "Purchase of Bitcoin",
+    "createAt": "22-01-2025 02:16",
+    "id": "1c72fe90-8059-4106-9521-8b1802686390"
+  }
+]
