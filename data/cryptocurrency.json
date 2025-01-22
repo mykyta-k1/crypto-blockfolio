@@ -1,0 +1,16 @@
+[
+  {
+    "balance": 0,
+    "currentPrice": 104223.0,
+    "name": "btc",
+    "count": 0.0,
+    "id": "109f9c0e-01cc-4dd2-a21f-bce02b7f5dbe"
+  },
+  {
+    "balance": 0,
+    "currentPrice": 1723.5,
+    "name": "eth",
+    "count": 0.0,
+    "id": "68c61fc9-a4c3-44de-a5a3-ec9e7ec7a197"
+  }
+]

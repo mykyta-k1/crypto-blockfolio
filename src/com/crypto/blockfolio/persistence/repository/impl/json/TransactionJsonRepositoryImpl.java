@@ -1,3 +1,4 @@
+/*
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
 import com.crypto.blockfolio.persistence.entity.Transaction;
@@ -12,7 +13,7 @@ final class TransactionJsonRepositoryImpl extends AbstractJsonRepository<Transac
     implements TransactionRepository {
 
     TransactionJsonRepositoryImpl(Gson gson) {
-        super(gson, JsonPathFactory.TRANSACTIONS_FILE.getPath(), TypeToken
+        super(gson, JsonPathFactory.PORTFOLIOS_FILE.getPath(), TypeToken
             .getParameterized(Set.class, Transaction.class)
             .getType());
     }
@@ -24,4 +25,26 @@ final class TransactionJsonRepositoryImpl extends AbstractJsonRepository<Transac
                 .equals(cryptocurrencyId))
             .findFirst();
     }
+
+    @Override
+    public void updateTransaction(String portfolioId, Transaction transaction) {
+        // Пошук транзакції за її ID
+        Optional<Transaction> existingTransaction = entities.stream()
+            .filter(t -> t.getId().equals(transaction.getId()))
+            .findFirst();
+
+        if (existingTransaction.isPresent()) {
+            entities.remove(existingTransaction.get());
+        } else {
+            System.out.println(
+                "Увага: транзакція з ID " + transaction.getId() + " не знайдена. Додаємо нову.");
+        }
+
+        // Додавання (або оновлення) транзакції
+        entities.add(transaction);
+        saveChanges();
+        System.out.println("Транзакцію з ID " + transaction.getId() + " успішно оновлено.");
+    }
+
 }
+*/

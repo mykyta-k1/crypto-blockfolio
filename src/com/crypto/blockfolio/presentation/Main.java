@@ -1,60 +1,47 @@
 package com.crypto.blockfolio.presentation;
 
+import com.crypto.blockfolio.domain.contract.CoinGeckoApiService;
+import com.crypto.blockfolio.domain.impl.CoinGeckoApiServiceImpl;
 import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
-import com.crypto.blockfolio.persistence.entity.Portfolio;
-import com.crypto.blockfolio.persistence.entity.Transaction;
-import com.crypto.blockfolio.persistence.entity.TransactionType;
-import com.crypto.blockfolio.persistence.entity.User;
-import com.crypto.blockfolio.persistence.repository.RepositoryFactory;
-import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
-import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
-import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
-import com.crypto.blockfolio.persistence.repository.contracts.UserRepository;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws NotImplementedException {
-        // Отримуємо фабрику JSON репозиторіїв
-        RepositoryFactory repositoryFactory = RepositoryFactory.getRepositoryFactory(
-            RepositoryFactory.JSON);
+    public static void main(String[] args) {
+        // Ініціалізація сервісу CoinGecko API
+        CoinGeckoApiService apiService = new CoinGeckoApiServiceImpl();
 
-        // Отримуємо репозиторії
-        UserRepository userRepository = repositoryFactory.getUserRepository();
-        CryptocurrencyRepository cryptocurrencyRepository = repositoryFactory.getCryptocurrencyRepository();
-        PortfolioRepository portfolioRepository = repositoryFactory.getPortfolioRepository();
-        TransactionRepository transactionRepository = repositoryFactory.getTransactionRepository();
+        // Тест №1: Отримання інформації про конкретну криптовалюту
+        System.out.println("--- Тест №1: Інформація про Bitcoin ---");
+        Cryptocurrency bitcoin1 = apiService.getCryptocurrencyInfo("bitcoin");
+        System.out.println("Результат: " + bitcoin1);
 
-        // Створюємо об'єкти
-        User user = new User(UUID.randomUUID(), "StrongPass123", "testuser", "test@example.com");
-        Cryptocurrency bitcoin = new Cryptocurrency(UUID.randomUUID(), "Bitcoin", 30000.0);
-        Cryptocurrency ethereum = new Cryptocurrency(UUID.randomUUID(), "Ethereum", 1500.0);
-        Portfolio portfolio = new Portfolio(UUID.randomUUID(), user, "My Portfolio", null, null);
-        Transaction transaction = new Transaction(
-            UUID.randomUUID(),
-            bitcoin,
-            TransactionType.BUY,
-            BigDecimal.valueOf(60000.0),
-            null,
-            BigDecimal.valueOf(50.0),
-            "Purchase of Bitcoin",
-            LocalDateTime.now()
-        );
+        // Затримка перед повторним викликом
+        sleep(2000);
 
-        // Додаємо об'єкти у відповідні репозиторії
-        userRepository.add(user);
-        cryptocurrencyRepository.add(bitcoin);
-        cryptocurrencyRepository.add(ethereum);
-        portfolioRepository.add(portfolio);
-        transactionRepository.add(transaction);
+        Cryptocurrency bitcoin2 = apiService.getCryptocurrencyInfo("bitcoin");
+        System.out.println("Результат: " + bitcoin2);
 
-        // Виконуємо commit, щоб зберегти дані у файли
-        repositoryFactory.commit();
+        // Тест №2: Отримання інформації про всі криптовалюти
+        System.out.println("--- Тест №2: Інформація про всі криптовалюти ---");
+        List<Cryptocurrency> allCryptocurrencies1 = apiService.getAllCryptocurrencies();
+        System.out.println("Кількість монет: " + allCryptocurrencies1.size());
 
-        // Виводимо підтвердження
-        System.out.println("Дані збережено у JSON файли.");
+        // Затримка перед повторним викликом
+        sleep(2000);
+
+        List<Cryptocurrency> allCryptocurrencies2 = apiService.getAllCryptocurrencies();
+        System.out.println("Кількість монет: " + allCryptocurrencies2.size());
+
+        // Тест завершено
+        System.out.println("--- Тестування завершено ---");
+    }
+
+    private static void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

@@ -11,17 +11,17 @@ import java.util.UUID;
 
 public class Portfolio extends Entity implements Comparable<Portfolio> {
 
-    private final User owner;
+    private final UUID ownerId;
     private final LocalDateTime createdAt;
     private String name;
     private BigDecimal totalValue;
     private Set<Cryptocurrency> watchlist;
     private Set<Transaction> transactionsList;
 
-    public Portfolio(UUID id, User owner, String name,
+    public Portfolio(UUID id, UUID ownerId, String name,
         Set<Cryptocurrency> watchlist, Set<Transaction> transactions) {
         super(id);
-        this.owner = owner;
+        this.ownerId = ownerId;
         this.name = name;
         this.totalValue = BigDecimal.ZERO;
         this.watchlist = watchlist != null ? new LinkedHashSet<>(watchlist) : new LinkedHashSet<>();
@@ -96,7 +96,7 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
                 .multiply(BigDecimal.valueOf(crypto.getCount())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-    
+
     @Override
     public int compareTo(Portfolio o) {
         return this.name.compareTo(o.name);
@@ -106,8 +106,27 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         return createdAt;
     }
 
-    public Set<Transaction> getTransactions() {
+    public Set<Transaction> getTransactionsList() {
         return transactionsList;
+    }
+
+    public void setTransactionsList(Set<Transaction> transactionsList) {
+        errors.clear();
+        if (transactionsList == null) {
+            errors.add("Список транзакцій не може бути null.");
+            return;
+        }
+
+        for (Transaction transaction : transactionsList) {
+            if (transaction == null || !transaction.isValid()) {
+                errors.add("Список транзакцій містить некоректну транзакцію: " +
+                    (transaction != null ? transaction.getErrors() : "null"));
+                return;
+            }
+        }
+
+        this.transactionsList = new LinkedHashSet<>(transactionsList);
+        calculateTotalValue();
     }
 
     public void setTransactions(Set<Transaction> transactionsList) {
@@ -122,8 +141,8 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         this.watchlist = watchlist;
     }
 
-    public User getOwner() {
-        return owner;
+    public UUID getOwnerId() {
+        return ownerId;
     }
 
     public String getName() {
@@ -144,12 +163,21 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         return totalValue;
     }
 
+    public void setTotalValue(BigDecimal totalValue) {
+        errors.clear();
+        if (totalValue == null || totalValue.compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Загальна вартість не може бути null або менше 0.");
+            return;
+        }
+        this.totalValue = totalValue;
+    }
+
     @Override
     public String toString() {
         return "Portfolio{" +
             "name='" + name + '\'' +
             ", totalValue=" + totalValue +
-            ", owner=" + (owner != null ? owner.getUsername() : "null") +
+            ", owner=" + ownerId +
             ", createdAt=" + createdAt +
             ", watchlist=" + watchlist +
             ", transactionsList=" + transactionsList +

@@ -4,8 +4,8 @@ import com.crypto.blockfolio.persistence.Entity;
 import com.crypto.blockfolio.persistence.exception.EntityArgumentException;
 import com.crypto.blockfolio.persistence.validation.ValidationUtils;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -15,9 +15,10 @@ public class User extends Entity implements Comparable<User> {
 
     private final String password;
     private final LocalDateTime createdAt;
-    private final List<Portfolio> portfolios;
-    private String email;
     private String username;
+    private String email;
+    private Set<UUID> portfolios = new LinkedHashSet<>();
+
 
     public User(UUID id, String password, String username, String email) {
         super(id);
@@ -25,13 +26,14 @@ public class User extends Entity implements Comparable<User> {
         setEmail(email);
         setUsername(username);
         this.createdAt = LocalDateTime.now();
-        this.portfolios = new ArrayList<>();
+        this.portfolios = new LinkedHashSet<>();
 
         if (!this.isValid()) {
             throw new EntityArgumentException(errors);
         }
     }
 
+    /*
     public void addPortfolio(Portfolio portfolio) {
         if (portfolios.size() >= MAX_PORTFOLIOS) {
             errors.add("Користувач не може мати більше ніж " + MAX_PORTFOLIOS + " портфелів.");
@@ -44,7 +46,7 @@ public class User extends Entity implements Comparable<User> {
         }
         portfolios.add(portfolio);
     }
-
+    */
     public boolean removePortfolio(Portfolio portfolio) {
         if (portfolio == null || !portfolios.remove(portfolio)) {
             errors.add("Портфель не знайдено у списку.");
@@ -106,10 +108,15 @@ public class User extends Entity implements Comparable<User> {
         return createdAt;
     }
 
-    public List<Portfolio> getPortfolios() {
+    public Set<UUID> getPortfolios() {
         return portfolios;
     }
 
+    public void setPortfolios(Set<UUID> portfolios) {
+        this.portfolios =
+            portfolios != null ? new LinkedHashSet<>(portfolios) : new LinkedHashSet<>();
+    }
+    /*
     public void setPortfolios(List<Portfolio> portfolios) {
         if (portfolios != null && portfolios.size() > MAX_PORTFOLIOS) {
             errors.add("Список портфелів перевищує максимальну кількість " + MAX_PORTFOLIOS);
@@ -122,7 +129,7 @@ public class User extends Entity implements Comparable<User> {
             this.portfolios.addAll(portfolios);
         }
     }
-
+    */
 
     public String getEmail() {
         return email;

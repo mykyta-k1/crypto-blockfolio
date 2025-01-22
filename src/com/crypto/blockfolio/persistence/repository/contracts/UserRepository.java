@@ -9,4 +9,6 @@ public interface UserRepository extends Repository<User> {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
+
+    void update(User user);
 }

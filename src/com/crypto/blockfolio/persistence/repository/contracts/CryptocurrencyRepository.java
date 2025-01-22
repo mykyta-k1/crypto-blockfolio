@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface CryptocurrencyRepository extends Repository<Cryptocurrency> {
 
     Optional<Cryptocurrency> findByName(String name);
+
+    Cryptocurrency update(Cryptocurrency cryptocurrency);
 }

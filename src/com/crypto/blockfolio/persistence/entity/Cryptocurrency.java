@@ -51,12 +51,9 @@ public class Cryptocurrency extends Entity implements Comparable<Cryptocurrency>
     }
 
     public void setName(String name) {
-        final String templateName = "назва монети";
+        //final String templateName = "назва монети";
         name = name != null ? name.trim() : null;
-        ValidationUtils.validateRequired(name, templateName, errors);
-        ValidationUtils.validateLength(name, 2, 50, templateName, errors);
-        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9\\s]+$", templateName, errors);
-        this.name = name;
+        this.name = name.toLowerCase();
     }
 
     public double getCount() {

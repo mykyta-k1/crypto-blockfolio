@@ -6,6 +6,7 @@ import com.crypto.blockfolio.persistence.repository.Repository;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -51,12 +52,17 @@ class AbstractJsonRepository<E extends Entity> implements Repository<E> {
     public E add(E entity) {
         entities.remove(entity);
         entities.add(entity);
+        saveChanges();
         return entity;
     }
 
     @Override
     public boolean remove(E entity) {
-        return entities.remove(entity);
+        boolean removed = entities.remove(entity);
+        if (removed) {
+            saveChanges();
+        }
+        return removed;
     }
 
     public Path getPath() {
@@ -73,6 +79,20 @@ class AbstractJsonRepository<E extends Entity> implements Repository<E> {
                 .formatted(path.getFileName()));
         }
     }
+
+    /**
+     * Метод для збереження змін, наприклад при оновленні цін криптомонеток
+     */
+    protected void saveChanges() {
+        try (FileWriter writer = new FileWriter(path.toFile())) {
+            gson.toJson(entities, writer);
+            System.out.println("Дані збережено у файл: " + path.toAbsolutePath());
+        } catch (IOException e) {
+            throw new JsonFileIOException(
+                "Не вдалося зберегти зміни у файл: %s".formatted(path.getFileName()), e);
+        }
+    }
+
 
     /**
      * Перевірка на валідність формату даних JSON.

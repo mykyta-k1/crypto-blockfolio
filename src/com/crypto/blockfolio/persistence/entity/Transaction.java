@@ -81,6 +81,7 @@ public class Transaction extends Entity implements Comparable<Transaction> {
         }
 
         this.costs = costs;
+        calculatePnl();
     }
 
     public BigDecimal getProfit() {
