@@ -4,6 +4,8 @@ import com.crypto.blockfolio.persistence.Entity;
 import com.crypto.blockfolio.persistence.entity.ErrorTemplates;
 import com.crypto.blockfolio.persistence.exception.EntityArgumentException;
 import com.crypto.blockfolio.persistence.validation.ValidationUtils;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserAddDto extends Entity {
@@ -11,12 +13,15 @@ public class UserAddDto extends Entity {
     private final String username;
     private final String rawPassword;
     private final String email;
+    private final Set<UUID> portfolios;
 
-    public UserAddDto(UUID id, String username, String rawPassword, String email) {
+    public UserAddDto(UUID id, String username, String rawPassword, String email,
+        Set<UUID> portfolios) {
         super(id);
         this.username = validateUsername(username);
         this.rawPassword = validatePassword(rawPassword);
         this.email = validateEmail(email);
+        this.portfolios = validatePortfolios(portfolios);
 
         if (!errors.isEmpty()) {
             throw new EntityArgumentException(errors);
@@ -48,15 +53,29 @@ public class UserAddDto extends Entity {
         return email;
     }
 
-    public String username() {
+    private Set<UUID> validatePortfolios(Set<UUID> portfolios) {
+        if (portfolios == null) {
+            return new LinkedHashSet<>();
+        }
+        if (portfolios.size() > 10) {
+            errors.add("Користувач не може мати більше ніж 10 портфелів.");
+        }
+        return new LinkedHashSet<>(portfolios);
+    }
+
+    public String getUsername() {
         return username;
     }
 
-    public String rawPassword() {
+    public String getRawPassword() {
         return rawPassword;
     }
 
-    public String email() {
+    public String getEmail() {
         return email;
+    }
+
+    public Set<UUID> getPortfolios() {
+        return portfolios;
     }
 }

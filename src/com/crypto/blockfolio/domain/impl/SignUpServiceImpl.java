@@ -23,7 +23,6 @@ public class SignUpServiceImpl implements SignUpService {
     private static LocalDateTime codeCreationTime;
     private final UserService userService;
 
-
     public SignUpServiceImpl(UserService userService) {
         this.userService = userService;
     }
@@ -103,7 +102,7 @@ public class SignUpServiceImpl implements SignUpService {
     }
 
     public void signUp(UserAddDto userAddDto, Supplier<String> waitForUserInput) {
-        String verificationCode = generateAndSendVerificationCode(userAddDto.email());
+        String verificationCode = generateAndSendVerificationCode(userAddDto.getEmail());
         String userInputCode = waitForUserInput.get();
 
         verifyCode(userInputCode, verificationCode);

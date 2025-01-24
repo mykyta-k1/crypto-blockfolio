@@ -2,6 +2,8 @@ package com.crypto.blockfolio.persistence.entity;
 
 import com.crypto.blockfolio.persistence.Entity;
 import com.crypto.blockfolio.persistence.exception.EntityArgumentException;
+import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
+import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import com.crypto.blockfolio.persistence.validation.ValidationUtils;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -33,20 +35,26 @@ public class User extends Entity implements Comparable<User> {
         }
     }
 
-    /*
-    public void addPortfolio(Portfolio portfolio) {
-        if (portfolios.size() >= MAX_PORTFOLIOS) {
-            errors.add("Користувач не може мати більше ніж " + MAX_PORTFOLIOS + " портфелів.");
+    public void addTransactionToPortfolio(UUID portfolioId, UUID transactionId,
+        PortfolioRepository portfolioRepository, TransactionRepository transactionRepository) {
+
+        if (!portfolios.contains(portfolioId)) {
+            throw new IllegalArgumentException("Цей портфель не належить даному користувачу.");
         }
-        if (portfolio == null) {
-            errors.add("Портфель не може бути null.");
-        }
-        if (!errors.isEmpty()) {
-            return;
-        }
-        portfolios.add(portfolio);
+
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Портфель із ID " + portfolioId + " не знайдено."));
+
+        // Перевірка на існування транзакції
+        transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Транзакція із ID " + transactionId + " не знайдена."));
+
+        // Викликаємо метод у репозиторії портфоліо для додавання транзакції
+        portfolioRepository.addTransaction(portfolioId, transactionId);
     }
-    */
+
     public boolean removePortfolio(Portfolio portfolio) {
         if (portfolio == null || !portfolios.remove(portfolio)) {
             errors.add("Портфель не знайдено у списку.");
@@ -116,20 +124,6 @@ public class User extends Entity implements Comparable<User> {
         this.portfolios =
             portfolios != null ? new LinkedHashSet<>(portfolios) : new LinkedHashSet<>();
     }
-    /*
-    public void setPortfolios(List<Portfolio> portfolios) {
-        if (portfolios != null && portfolios.size() > MAX_PORTFOLIOS) {
-            errors.add("Список портфелів перевищує максимальну кількість " + MAX_PORTFOLIOS);
-        }
-        if (this.isValid()) {
-            return;
-        }
-        this.portfolios.clear();
-        if (portfolios != null) {
-            this.portfolios.addAll(portfolios);
-        }
-    }
-    */
 
     public String getEmail() {
         return email;
@@ -143,4 +137,30 @@ public class User extends Entity implements Comparable<User> {
             templateName, errors);
         this.email = email;
     }
+
+    public boolean addPortfolio(UUID portfolioId) {
+        if (portfolioId == null) {
+            errors.add("ID портфеля не може бути null.");
+            return false;
+        }
+
+        if (portfolios.contains(portfolioId)) {
+            errors.add("Портфель із цим ID вже існує у користувача.");
+            return false;
+        }
+
+        portfolios.add(portfolioId);
+        return true;
+    }
+
+    public boolean removePortfolio(UUID portfolioId) {
+        if (portfolioId == null || !portfolios.contains(portfolioId)) {
+            errors.add("Портфель із таким ID не знайдено у користувача.");
+            return false;
+        }
+
+        portfolios.remove(portfolioId);
+        return true;
+    }
+
 }

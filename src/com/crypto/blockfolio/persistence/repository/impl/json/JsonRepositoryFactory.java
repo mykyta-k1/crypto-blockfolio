@@ -1,10 +1,11 @@
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
-import com.crypto.blockfolio.persistence.Entity;
+import com.crypto.blockfolio.persistence.Identifiable;
 import com.crypto.blockfolio.persistence.exception.JsonFileIOException;
 import com.crypto.blockfolio.persistence.repository.RepositoryFactory;
 import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
 import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
+import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import com.crypto.blockfolio.persistence.repository.contracts.UserRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +27,7 @@ public class JsonRepositoryFactory extends RepositoryFactory {
     private final UserJsonRepositoryImpl userJsonRepositoryImpl;
     private final CryptocurrencyJsonRepositoryImpl cryptocurrencyJsonRepositoryImpl;
     private final PortfolioJsonRepositoryImpl portfolioJsonRepositoryImpl;
-    //private final TransactionJsonRepositoryImpl transactionJsonRepositoryImpl;
+    private final TransactionJsonRepositoryImpl transactionJsonRepositoryImpl;
 
     private JsonRepositoryFactory() {
         // Адаптер для типу даних LocalDateTime при серіалізації/десеріалізації
@@ -56,8 +57,9 @@ public class JsonRepositoryFactory extends RepositoryFactory {
 
         userJsonRepositoryImpl = new UserJsonRepositoryImpl(gson);
         cryptocurrencyJsonRepositoryImpl = new CryptocurrencyJsonRepositoryImpl(gson);
-        portfolioJsonRepositoryImpl = new PortfolioJsonRepositoryImpl(gson);
-        //transactionJsonRepositoryImpl = new TransactionJsonRepositoryImpl(gson);
+        portfolioJsonRepositoryImpl = new PortfolioJsonRepositoryImpl(gson,
+            getTransactionRepository());
+        transactionJsonRepositoryImpl = new TransactionJsonRepositoryImpl(gson);
     }
 
     public static JsonRepositoryFactory getInstance() {
@@ -74,12 +76,11 @@ public class JsonRepositoryFactory extends RepositoryFactory {
         return portfolioJsonRepositoryImpl;
     }
 
-    /*
     @Override
     public TransactionRepository getTransactionRepository() {
         return transactionJsonRepositoryImpl;
     }
-    */
+
     @Override
     public UserRepository getUserRepository() {
         return userJsonRepositoryImpl;
@@ -91,12 +92,11 @@ public class JsonRepositoryFactory extends RepositoryFactory {
             cryptocurrencyJsonRepositoryImpl.findAll());
         serializeEntities(portfolioJsonRepositoryImpl.getPath(),
             portfolioJsonRepositoryImpl.findAll());
-        /*
         serializeEntities(transactionJsonRepositoryImpl.getPath(),
-            transactionJsonRepositoryImpl.findAll()); */
+            transactionJsonRepositoryImpl.findAll());
     }
 
-    private <E extends Entity> void serializeEntities(Path path, Set<E> entities) {
+    private <E extends Identifiable<ID>, ID> void serializeEntities(Path path, Set<E> entities) {
         try (FileWriter writer = new FileWriter(path.toFile())) {
             // Скидуємо файлик, перед збереженням!
             writer.write("");

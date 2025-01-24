@@ -8,7 +8,7 @@ import com.crypto.blockfolio.persistence.entity.Portfolio;
 import java.util.List;
 import java.util.UUID;
 
-public interface PortfolioService extends Service<Portfolio>, Reportable<Portfolio> {
+public interface PortfolioService extends Service<Portfolio, UUID>, Reportable<Portfolio> {
 
     Portfolio addPortfolio(PortfolioAddDto portfolioAddDto);
 

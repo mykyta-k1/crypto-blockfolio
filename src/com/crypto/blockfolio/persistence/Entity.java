@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-public class Entity {
+public class Entity implements Identifiable<UUID> {
 
     protected final UUID id;
     protected transient Set<String> errors;
@@ -43,5 +43,10 @@ public class Entity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public UUID getIdentifier() {
+        return id;
     }
 }

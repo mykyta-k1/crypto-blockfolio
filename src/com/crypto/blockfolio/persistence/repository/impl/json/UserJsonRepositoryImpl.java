@@ -6,51 +6,96 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
-final class UserJsonRepositoryImpl extends AbstractJsonRepository<User>
+final class UserJsonRepositoryImpl extends AbstractJsonRepository<User, UUID>
     implements UserRepository {
 
     UserJsonRepositoryImpl(Gson gson) {
-        super(gson, JsonPathFactory.USERS_FILE.getPath(), TypeToken
-            .getParameterized(Set.class, User.class)
-            .getType());
+        super(
+            gson,
+            JsonPathFactory.USERS_FILE.getPath(),
+            TypeToken.getParameterized(Set.class, User.class).getType(),
+            User::getId // Вказуємо, що ідентифікатором є UUID
+        );
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return entities.stream().filter(u -> u.getUsername().equals(username)).findFirst();
+        return entities.stream()
+            .filter(u -> u.getUsername() != null && u.getUsername().equalsIgnoreCase(username))
+            .findFirst();
     }
-    /*
+
     @Override
     public Optional<User> findByEmail(String email) {
-        return entities.stream().filter(u -> u.getUsername().equals(email)).findFirst();
+        return entities.stream()
+            .filter(u -> u.getEmail() != null && u.getEmail().equalsIgnoreCase(email))
+            .findFirst();
     }
-     */
 
     @Override
     public void update(User user) {
-        Optional<User> existingUser = entities.stream()
-            .filter(u -> u.getId().equals(user.getId()))
-            .findFirst();
+        // Перевірка валідності нового користувача
+        if (!user.isValid()) {
+            throw new IllegalArgumentException(
+                "Користувач має невалідні дані: " + user.getErrors());
+        }
 
+        // Пошук існуючого користувача
+        Optional<User> existingUser = findById(user.getId());
+
+        // Оновлення або повідомлення про відсутність
         if (existingUser.isPresent()) {
             entities.remove(existingUser.get());
             entities.add(user);
             saveChanges();
-            System.out.println("Користувач з ID " + user.getId() + " успішно оновлений.");
+            System.out.println("Користувач із ID " + user.getId() + " успішно оновлений.");
         } else {
-            throw new RuntimeException("Користувач з ID " + user.getId() + " не знайдений.");
+            throw new RuntimeException("Користувач із ID " + user.getId() + " не знайдений.");
         }
     }
 
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        System.out.println("Пошук користувача за email: " + email);
-        return entities.stream()
-            .peek(user -> System.out.println("Перевіряємо користувача: " + user.getEmail()))
-            .filter(u -> u.getEmail().equalsIgnoreCase(email))
-            .findFirst();
+    public void addPortfolio(UUID userId, UUID portfolioId) {
+        User user = findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        if (user.getPortfolios().contains(portfolioId)) {
+            throw new IllegalArgumentException("Це портфоліо вже належить користувачу.");
+        }
+
+        user.getPortfolios().add(portfolioId);
+        add(user); // Оновлюємо користувача в репозиторії
+    }
+
+    @Override
+    public void removePortfolio(UUID userId, UUID portfolioId) {
+        User user = findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        if (!user.getPortfolios().remove(portfolioId)) {
+            throw new IllegalArgumentException("Це портфоліо не належить користувачу.");
+        }
+
+        add(user); // Оновлюємо користувача в репозиторії
+    }
+
+    @Override
+    public boolean ownsPortfolio(UUID userId, UUID portfolioId) {
+        User user = findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        return user.getPortfolios().contains(portfolioId);
+    }
+
+    @Override
+    public Set<UUID> getPortfolios(UUID userId) {
+        User user = findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        return user.getPortfolios();
     }
 
 }

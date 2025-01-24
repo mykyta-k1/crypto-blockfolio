@@ -1,4 +1,3 @@
-/*
 package com.crypto.blockfolio.persistence.repository.contracts;
 
 import com.crypto.blockfolio.persistence.entity.Transaction;
@@ -6,10 +5,11 @@ import com.crypto.blockfolio.persistence.repository.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TransactionRepository extends Repository<Transaction> {
+public interface TransactionRepository extends Repository<Transaction, UUID> {
 
-    Optional<Transaction> findByCryptocurrencyId(UUID cryptocurrencyId);
+    Optional<Transaction> findByCryptocurrencyId(String cryptocurrencyId);
 
-    void updateTransaction(String portfolioId, Transaction transaction);
+    void update(Transaction transaction);
+
+    void delete(UUID transactionId);
 }
-*/

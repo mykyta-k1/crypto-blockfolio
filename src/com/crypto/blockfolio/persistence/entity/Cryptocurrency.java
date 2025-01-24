@@ -1,36 +1,38 @@
 package com.crypto.blockfolio.persistence.entity;
 
-import com.crypto.blockfolio.persistence.Entity;
-import com.crypto.blockfolio.persistence.exception.EntityArgumentException;
-import com.crypto.blockfolio.persistence.validation.ValidationUtils;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.UUID;
+import com.crypto.blockfolio.persistence.CryptoEntity;
+import java.time.LocalDateTime;
 
-public class Cryptocurrency extends Entity implements Comparable<Cryptocurrency> {
+public class Cryptocurrency extends CryptoEntity implements Comparable<Cryptocurrency> {
 
-    private BigDecimal balance;
     private double currentPrice;
-    private String name;
-    private double count;
+    private double marketCap;
+    private double volume24h;
+    private double percentChange24h;
+    private LocalDateTime lastUpdated;
 
-    public Cryptocurrency(UUID id, String name, double currentPrice) {
-        super(id);
-        setName(name);
-        setCurrentPrice(currentPrice);
-        calculateBalance();
-
-        if (!this.isValid()) {
-            throw new EntityArgumentException(errors);
-        }
+    public Cryptocurrency(String symbol, String name, double currentPrice, double marketCap,
+        double volume24h, double percentChange24h, LocalDateTime lastUpdated) {
+        super(symbol, name);
+        this.currentPrice = validatePositiveNumber(currentPrice, "Ціна");
+        this.marketCap = validatePositiveNumber(marketCap, "Ринкова капіталізація");
+        this.volume24h = validatePositiveNumber(volume24h, "Обсяг торгів за 24 години");
+        this.percentChange24h = percentChange24h; // Відсоткова зміна може бути від'ємною
+        this.lastUpdated = validateLastUpdated(lastUpdated);
     }
 
-    @Override
-    public int compareTo(Cryptocurrency o) {
-        if (o == null || o.name == null) {
-            return 1;
+    private double validatePositiveNumber(double value, String fieldName) {
+        if (value <= 0) {
+            errors.add(fieldName + " повинно бути додатнім числом.");
         }
-        return this.name.compareTo(o.name);
+        return value;
+    }
+
+    private LocalDateTime validateLastUpdated(LocalDateTime lastUpdated) {
+        if (lastUpdated == null || lastUpdated.isAfter(LocalDateTime.now())) {
+            errors.add("Час останнього оновлення не може бути в майбутньому або пустим.");
+        }
+        return lastUpdated;
     }
 
     public double getCurrentPrice() {
@@ -38,56 +40,54 @@ public class Cryptocurrency extends Entity implements Comparable<Cryptocurrency>
     }
 
     public void setCurrentPrice(double currentPrice) {
-        if (currentPrice <= 0) {
-            errors.add("Ціна монети повинна бути додатною.");
-        }
-
-        this.currentPrice = currentPrice;
-        calculateBalance();
+        this.currentPrice = validatePositiveNumber(currentPrice, "Ціна");
     }
 
-    public String getName() {
-        return name;
+    public double getMarketCap() {
+        return marketCap;
     }
 
-    public void setName(String name) {
-        //final String templateName = "назва монети";
-        name = name != null ? name.trim() : null;
-        this.name = name.toLowerCase();
+    public void setMarketCap(double marketCap) {
+        this.marketCap = validatePositiveNumber(marketCap, "Ринкова капіталізація");
     }
 
-    public double getCount() {
-        return count;
+    public double getVolume24h() {
+        return volume24h;
     }
 
-    public void setCount(double count) {
-        final String templateName = "кількість монет";
-        ValidationUtils.validatePositiveNumber(count, templateName, errors);
-        this.count = count;
-        calculateBalance();
+    public void setVolume24h(double volume24h) {
+        this.volume24h = validatePositiveNumber(volume24h, "Обсяг торгів за 24 години");
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public double getPercentChange24h() {
+        return percentChange24h;
     }
 
-    private void calculateBalance() {
-        if (currentPrice <= 0 || count <= 0) {
-            this.balance = BigDecimal.ZERO;
-        } else {
-            this.balance = BigDecimal.valueOf(currentPrice)
-                .multiply(BigDecimal.valueOf(count))
-                .setScale(2, RoundingMode.HALF_UP);
-        }
+    public void setPercentChange24h(double percentChange24h) {
+        this.percentChange24h = percentChange24h;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = validateLastUpdated(lastUpdated);
+    }
+
+    @Override
+    public int compareTo(Cryptocurrency o) {
+        return this.getSymbol().compareTo(o.getSymbol());
     }
 
     @Override
     public String toString() {
         return "Cryptocurrency{" +
-            "name='" + name + '\'' +
-            ", currentPrice=" + currentPrice +
-            ", count=" + count +
-            ", balance=" + balance +
+            "currentPrice=" + currentPrice +
+            ", marketCap=" + marketCap +
+            ", volume24h=" + volume24h +
+            ", percentChange24h=" + percentChange24h +
+            ", lastUpdated=" + lastUpdated +
             '}';
     }
 }

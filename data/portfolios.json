@@ -1,57 +1,11 @@
 [
   {
-    "ownerId": "55c5e1d1-c5a4-4379-86de-1aa369f3711d",
-    "createdAt": "23-01-2025 00:53",
-    "name": "Main Portfolio",
-    "totalValue": 16495.200,
-    "watchlist": [
-      {
-        "balance": 15633.45,
-        "currentPrice": 104223.0,
-        "name": "btc",
-        "count": 0.15,
-        "id": "109f9c0e-01cc-4dd2-a21f-bce02b7f5dbe"
-      },
-      {
-        "balance": 861.75,
-        "currentPrice": 1723.5,
-        "name": "eth",
-        "count": 0.5,
-        "id": "68c61fc9-a4c3-44de-a5a3-ec9e7ec7a197"
-      }
-    ],
-    "transactionsList": [
-      {
-        "cryptocurrency": {
-          "balance": 15633.45,
-          "currentPrice": 104223.0,
-          "name": "btc",
-          "count": 0.15,
-          "id": "109f9c0e-01cc-4dd2-a21f-bce02b7f5dbe"
-        },
-        "transactionType": "BUY",
-        "costs": 15633.449999999999,
-        "fees": 0,
-        "description": "Initial BTC purchase",
-        "createAt": "23-01-2025 00:53",
-        "id": "1c4eedc9-7cb8-4467-9067-08b431c8244f"
-      },
-      {
-        "cryptocurrency": {
-          "balance": 861.75,
-          "currentPrice": 1723.5,
-          "name": "eth",
-          "count": 0.5,
-          "id": "68c61fc9-a4c3-44de-a5a3-ec9e7ec7a197"
-        },
-        "transactionType": "BUY",
-        "costs": 861.75,
-        "fees": 0,
-        "description": "Initial ETH purchase",
-        "createAt": "23-01-2025 00:53",
-        "id": "0e9f5004-9746-4dc7-a640-6f3e1c40ec95"
-      }
-    ],
-    "id": "a66b6e25-79ad-4dfb-ac8c-f2d60780dec1"
+    "ownerId": "bdc31206-67c9-47c5-af1e-0371456a0e76",
+    "createdAt": "24-01-2025 12:53",
+    "balances": {},
+    "transactionsList": [],
+    "name": "My Portfolio",
+    "totalValue": 0,
+    "id": "bb10b62c-7cca-4781-a9c0-30c4a71eae68"
   }
 ]

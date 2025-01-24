@@ -1,68 +1,70 @@
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
+import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
 import com.crypto.blockfolio.persistence.entity.Portfolio;
-import com.crypto.blockfolio.persistence.entity.Transaction;
 import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
+import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-final class PortfolioJsonRepositoryImpl extends AbstractJsonRepository<Portfolio>
+public class PortfolioJsonRepositoryImpl extends AbstractJsonRepository<Portfolio, UUID>
     implements PortfolioRepository {
 
-    PortfolioJsonRepositoryImpl(Gson gson) {
-        super(gson, JsonPathFactory.PORTFOLIOS_FILE.getPath(), TypeToken
-            .getParameterized(Set.class, Portfolio.class)
-            .getType());
+    private final TransactionRepository transactionRepository;
+
+    public PortfolioJsonRepositoryImpl(Gson gson, TransactionRepository transactionRepository) {
+        super(
+            gson,
+            JsonPathFactory.PORTFOLIOS_FILE.getPath(),
+            TypeToken.getParameterized(Set.class, Portfolio.class).getType(),
+            Portfolio::getId
+        );
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
     public Optional<Portfolio> findByName(String name) {
-        return entities.stream().filter(p -> p.getName().equalsIgnoreCase(name)).findFirst();
+        return findAll(p -> p.getName() != null && p.getName().equalsIgnoreCase(name))
+            .stream().findFirst();
     }
 
     @Override
-    public void updatePortfolio(Portfolio portfolio) {
-        Optional<Portfolio> existingPortfolio = entities.stream()
-            .filter(p -> p.getId().equals(portfolio.getId()))
-            .findFirst();
-
-        if (existingPortfolio.isPresent()) {
-            entities.remove(existingPortfolio.get());
-        }
-
-        entities.add(portfolio);
-        saveChanges();
-        System.out.println("Портфель з ID " + portfolio.getId() + " успішно оновлено.");
-    }
-
-    @Override
-    public void addTransactionToPortfolio(UUID portfolioId, Transaction transaction) {
+    public void addTransaction(UUID portfolioId, UUID transactionId) {
         Portfolio portfolio = findById(portfolioId)
-            .orElseThrow(
-                () -> new RuntimeException("Портфель з ID " + portfolioId + " не знайдено."));
-        portfolio.addTransactions(transaction);
-        updatePortfolio(portfolio);
+            .orElseThrow(() -> new IllegalArgumentException("Портфоліо не знайдено"));
+
+        transactionRepository.findById(transactionId).ifPresentOrElse(transaction -> {
+            Cryptocurrency cryptocurrency = transaction.getCryptocurrency();
+            portfolio.addTransaction(
+                transaction.getId(),
+                cryptocurrency,
+                transaction.getAmount(),
+                transaction.getTransactionType()
+            );
+            add(portfolio); // Зберігаємо оновлене портфоліо
+        }, () -> {
+            throw new IllegalArgumentException("Транзакцію не знайдено.");
+        });
+    }
+
+
+    @Override
+    public void removeTransaction(UUID portfolioId, UUID transactionId) {
+        Portfolio portfolio = findById(portfolioId)
+            .orElseThrow(() -> new IllegalArgumentException("Портфоліо не знайдено"));
+        portfolio.removeTransaction(transactionId, transactionRepository);
+        add(portfolio); // Оновлюємо портфоліо
     }
 
     @Override
-    public void updateTransactionInPortfolio(UUID portfolioId, Transaction transaction) {
+    public void updateTotalValue(UUID portfolioId) {
         Portfolio portfolio = findById(portfolioId)
-            .orElseThrow(
-                () -> new RuntimeException("Портфель з ID " + portfolioId + " не знайдено."));
-        portfolio.delTransactions(transaction);
-        portfolio.addTransactions(transaction);
-        updatePortfolio(portfolio);
-    }
+            .orElseThrow(() -> new IllegalArgumentException("Портфоліо не знайдено"));
 
-    @Override
-    public void removeTransactionFromPortfolio(UUID portfolioId, UUID transactionId) {
-        Portfolio portfolio = findById(portfolioId)
-            .orElseThrow(
-                () -> new RuntimeException("Портфель з ID " + portfolioId + " не знайдено."));
-        portfolio.getTransactionsList().removeIf(t -> t.getId().equals(transactionId));
-        updatePortfolio(portfolio);
+        portfolio.calculateTotalValue();
+        add(portfolio);
     }
 }

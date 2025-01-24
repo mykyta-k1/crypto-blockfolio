@@ -7,7 +7,7 @@ import com.crypto.blockfolio.persistence.entity.Transaction;
 import java.util.List;
 import java.util.UUID;
 
-public interface TransactionService extends Service<Transaction>, Reportable<Transaction> {
+public interface TransactionService extends Service<Transaction, UUID>, Reportable<Transaction> {
 
     Transaction addTransaction(TransactionAddDto transactionAddDto);
 

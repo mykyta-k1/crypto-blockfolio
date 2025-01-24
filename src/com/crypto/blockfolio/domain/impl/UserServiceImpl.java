@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,7 +23,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.mindrot.bcrypt.BCrypt;
 
 
-public class UserServiceImpl extends GenericService<User> implements UserService {
+public class UserServiceImpl extends GenericService<User, UUID> implements UserService {
 
     private final UserRepository userRepository;
 
@@ -62,17 +63,17 @@ public class UserServiceImpl extends GenericService<User> implements UserService
 
     @Override
     public User add(UserAddDto userAddDto) {
-        if (userRepository.findByEmail(userAddDto.email()).isPresent()) {
+        if (userRepository.findByEmail(userAddDto.getEmail()).isPresent()) {
             throw new SignUpException("Користувач із таким email вже існує.");
         }
-        
+
         try {
             System.out.println("Додаємо користувача до репозиторію: " + userAddDto);
             User user = new User(
                 userAddDto.getId(),
-                BCrypt.hashpw(userAddDto.rawPassword(), BCrypt.gensalt()), // Хешування пароля
-                userAddDto.username(),
-                userAddDto.email()
+                BCrypt.hashpw(userAddDto.getRawPassword(), BCrypt.gensalt()), // Хешування пароля
+                userAddDto.getUsername(),
+                userAddDto.getEmail()
             );
             userRepository.add(user);
             System.out.println("Користувач успішно доданий: " + user);

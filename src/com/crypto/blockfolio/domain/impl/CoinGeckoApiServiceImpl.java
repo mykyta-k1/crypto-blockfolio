@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
@@ -66,7 +65,17 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
             JsonArray jsonResponse = makeApiRequest(endpoint).getAsJsonArray();
             List<Cryptocurrency> cryptocurrencies = new ArrayList<>();
             for (JsonElement element : jsonResponse) {
-                cryptocurrencies.add(mapJsonToCryptocurrency(element.getAsJsonObject()));
+                JsonObject coinData = element.getAsJsonObject();
+                cryptocurrencies.add(new Cryptocurrency(
+                    coinData.get("symbol").getAsString().toUpperCase(),
+                    coinData.get("name").getAsString(),
+                    coinData.get("current_price").getAsDouble(),
+                    coinData.has("market_cap") ? coinData.get("market_cap").getAsDouble() : 0.0,
+                    coinData.has("total_volume") ? coinData.get("total_volume").getAsDouble() : 0.0,
+                    coinData.has("price_change_percentage_24h") ?
+                        coinData.get("price_change_percentage_24h").getAsDouble() : 0.0,
+                    LocalDateTime.now()
+                ));
             }
 
             // Збереження даних у кеш
@@ -93,52 +102,49 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
             return GSON.fromJson(reader, JsonElement.class);
         }
     }
-    /*
+
     private Cryptocurrency mapJsonToCryptocurrency(JsonObject jsonObject) {
         try {
-            if (!jsonObject.has("name") || !jsonObject.has("current_price")) {
-                throw new IllegalArgumentException(
-                    "Відсутні необхідні поля у JSON об'єкті: " + jsonObject);
-            }
-
+            String symbol = jsonObject.get("symbol").getAsString().toUpperCase();
             String name = jsonObject.get("name").getAsString();
-            double currentPrice = jsonObject.get("current_price").getAsDouble();
 
-            return new Cryptocurrency(UUID.randomUUID(), name, currentPrice);
-        } catch (NullPointerException | IllegalStateException e) {
+            double currentPrice =
+                jsonObject.has("current_price") ? jsonObject.get("current_price").getAsDouble()
+                    : 0.0;
+
+            double marketCap =
+                jsonObject.has("market_cap") ? jsonObject.get("market_cap").getAsDouble() : 0.0;
+
+            double totalVolume =
+                jsonObject.has("total_volume") ? jsonObject.get("total_volume").getAsDouble() : 0.0;
+
+            double priceChange24h =
+                jsonObject.has("price_change_24h") ? jsonObject.get("price_change_24h")
+                    .getAsDouble() : 0.0;
+
+            double priceChangePercentage24h =
+                jsonObject.has("price_change_percentage_24h") ? jsonObject.get(
+                    "price_change_percentage_24h").getAsDouble() : 0.0;
+
+            LocalDateTime lastUpdated = jsonObject.has("last_updated")
+                ? LocalDateTime.parse(jsonObject.get("last_updated").getAsString().replace("Z", ""))
+                : LocalDateTime.now();
+
+            return new Cryptocurrency(
+                symbol,
+                name,
+                currentPrice,
+                marketCap,
+                totalVolume,
+                priceChangePercentage24h,
+                lastUpdated
+            );
+        } catch (Exception e) {
             System.err.println("Помилка обробки JSON: " + jsonObject);
             throw new RuntimeException("Неправильний формат даних від CoinGecko API", e);
         }
     }
 
-     */
-
-    private Cryptocurrency mapJsonToCryptocurrency(JsonObject jsonObject) {
-        try {
-            String name;
-            double currentPrice;
-
-            // Перевіряємо, який формат відповіді прийшов
-            if (jsonObject.has("market_data")) {
-                // Формат відповіді від /coins/{id}
-                name = jsonObject.get("name").getAsString();
-                currentPrice = jsonObject.getAsJsonObject("market_data")
-                    .get("current_price")
-                    .getAsJsonObject()
-                    .get("usd")
-                    .getAsDouble();
-            } else {
-                // Формат відповіді від /coins/markets
-                name = jsonObject.get("name").getAsString();
-                currentPrice = jsonObject.get("current_price").getAsDouble();
-            }
-
-            return new Cryptocurrency(UUID.randomUUID(), name, currentPrice);
-        } catch (NullPointerException | IllegalStateException e) {
-            System.err.println("Помилка обробки JSON: " + jsonObject);
-            throw new RuntimeException("Неправильний формат даних від CoinGecko API", e);
-        }
-    }
 
     /**
      * Методи кешування відповіді від апі

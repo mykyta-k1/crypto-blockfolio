@@ -1,13 +1,12 @@
 package com.crypto.blockfolio.domain;
 
-import com.crypto.blockfolio.persistence.Entity;
+import com.crypto.blockfolio.persistence.Identifiable;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 
-public interface Service<E extends Entity> {
+public interface Service<E extends Identifiable<ID>, ID> {
 
-    E get(UUID id);
+    E get(ID id);
 
     Set<E> getAll();
 

@@ -1,6 +1,6 @@
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
-import com.crypto.blockfolio.persistence.Entity;
+import com.crypto.blockfolio.persistence.Identifiable;
 import com.crypto.blockfolio.persistence.exception.JsonFileIOException;
 import com.crypto.blockfolio.persistence.repository.Repository;
 import com.google.gson.Gson;
@@ -15,27 +15,32 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-class AbstractJsonRepository<E extends Entity> implements Repository<E> {
+class AbstractJsonRepository<E extends Identifiable<ID>, ID> implements Repository<E, ID> {
 
     protected final Set<E> entities;
+    private final Function<E, ID> identifierExtractor;
     private final Gson gson;
     private final Path path;
     private final Type collectionType;
 
-    AbstractJsonRepository(Gson gson, Path path, Type collectionType) {
+    AbstractJsonRepository(Gson gson, Path path, Type collectionType,
+        Function<E, ID> identifierExtractor) {
         this.gson = gson;
         this.path = path;
         this.collectionType = collectionType;
         entities = loadAll();
+        this.identifierExtractor = identifierExtractor;
     }
 
     @Override
-    public Optional<E> findById(UUID id) {
-        return entities.stream().filter(e -> e.getId().equals(id)).findFirst();
+    public Optional<E> findById(ID id) {
+        return entities.stream()
+            .filter(e -> identifierExtractor.apply(e).equals(id))
+            .findFirst();
     }
 
     @Override
@@ -92,7 +97,6 @@ class AbstractJsonRepository<E extends Entity> implements Repository<E> {
                 "Не вдалося зберегти зміни у файл: %s".formatted(path.getFileName()), e);
         }
     }
-
 
     /**
      * Перевірка на валідність формату даних JSON.

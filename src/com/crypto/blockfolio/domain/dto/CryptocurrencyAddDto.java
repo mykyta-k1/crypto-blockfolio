@@ -1,37 +1,60 @@
 package com.crypto.blockfolio.domain.dto;
 
-import com.crypto.blockfolio.persistence.Entity;
+import com.crypto.blockfolio.persistence.CryptoEntity;
 import com.crypto.blockfolio.persistence.validation.ValidationUtils;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
-public class CryptocurrencyAddDto extends Entity {
+public class CryptocurrencyAddDto extends CryptoEntity {
 
-    private final String name;
     private final double currentPrice;
-    private final double count;
+    private final double marketCap;
+    private final double volume24h;
+    private final double percentChange24h;
+    private final LocalDateTime lastUpdated;
 
-    public CryptocurrencyAddDto(UUID id, String name, double currentPrice, double count) {
-        super(id);
-        this.name = validatedName(name);
-        this.currentPrice = validatedPrice(currentPrice);
-        this.count = validatedCount(count);
+    public CryptocurrencyAddDto(
+        String symbol, String name, double currentPrice, double marketCap,
+        double volume24h, double percentChange24h, LocalDateTime lastUpdated
+    ) {
+        super(symbol,
+            name); // Ідентифікатор для `Cryptocurrency` не потрібен, використовуємо символ.
+        this.currentPrice = validatePositiveNumber(currentPrice, "Ціна");
+        this.marketCap = validatePositiveNumber(marketCap, "Ринкова капіталізація");
+        this.volume24h = validatePositiveNumber(volume24h, "Обсяг торгів за 24 години");
+        this.percentChange24h = percentChange24h; // Відсоткова зміна може бути від'ємною
+        this.lastUpdated = validateLastUpdated(lastUpdated);
     }
 
-    private String validatedName(String name) {
-        ValidationUtils.validateRequired(name, "назва монети", errors);
-        ValidationUtils.validateLength(name, 2, 50, "назва монети", errors);
-        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9\\s]+$", "назва монети", errors);
+    private String validateSymbol(String symbol) {
+        ValidationUtils.validateRequired(symbol, "Символ монети", errors);
+        ValidationUtils.validateLength(symbol, 1, 10, "Символ монети", errors);
+        ValidationUtils.validatePattern(symbol, "^[A-Z0-9]+$", "Символ монети", errors);
+        return symbol;
+    }
+
+    private String validateName(String name) {
+        ValidationUtils.validateRequired(name, "Назва монети", errors);
+        ValidationUtils.validateLength(name, 2, 50, "Назва монети", errors);
+        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9\\s]+$", "Назва монети", errors);
         return name;
     }
 
-    private double validatedPrice(double price) {
-        ValidationUtils.validatePositiveNumber(price, "ціна монети", errors);
-        return price;
+    private double validatePositiveNumber(double value, String fieldName) {
+        if (value <= 0) {
+            errors.add(fieldName + " повинно бути додатнім числом.");
+        }
+        return value;
     }
 
-    private double validatedCount(double count) {
-        ValidationUtils.validatePositiveNumber(count, "кількість монет", errors);
-        return count;
+    private LocalDateTime validateLastUpdated(LocalDateTime lastUpdated) {
+        if (lastUpdated == null || lastUpdated.isAfter(LocalDateTime.now())) {
+            errors.add("Час останнього оновлення не може бути в майбутньому або пустим.");
+        }
+        return lastUpdated;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     public String getName() {
@@ -42,7 +65,19 @@ public class CryptocurrencyAddDto extends Entity {
         return currentPrice;
     }
 
-    public double getCount() {
-        return count;
+    public double getMarketCap() {
+        return marketCap;
+    }
+
+    public double getVolume24h() {
+        return volume24h;
+    }
+
+    public double getPercentChange24h() {
+        return percentChange24h;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
     }
 }

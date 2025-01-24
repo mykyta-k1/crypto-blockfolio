@@ -1,4 +1,3 @@
-/*
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
 import com.crypto.blockfolio.persistence.entity.Transaction;
@@ -9,42 +8,62 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-final class TransactionJsonRepositoryImpl extends AbstractJsonRepository<Transaction>
+final class TransactionJsonRepositoryImpl extends AbstractJsonRepository<Transaction, UUID>
     implements TransactionRepository {
 
     TransactionJsonRepositoryImpl(Gson gson) {
-        super(gson, JsonPathFactory.PORTFOLIOS_FILE.getPath(), TypeToken
-            .getParameterized(Set.class, Transaction.class)
-            .getType());
+        super(
+            gson,
+            JsonPathFactory.TRANSACTIONS_FILE.getPath(),
+            TypeToken.getParameterized(Set.class, Transaction.class).getType(),
+            Transaction::getId
+        );
     }
 
     @Override
-    public Optional<Transaction> findByCryptocurrencyId(UUID cryptocurrencyId) {
+    public Optional<Transaction> findByCryptocurrencyId(String cryptocurrencySymbol) {
         return entities.stream()
-            .filter(t -> t.getCryptocurrency() != null && t.getCryptocurrency().getId()
-                .equals(cryptocurrencyId))
+            .filter(t -> t.getCryptocurrency() != null) // Перевіряємо, що криптовалюта не null
+            .filter(
+                t -> t.getCryptocurrency().getSymbol() != null) // Перевіряємо, що symbol не null
+            .filter(t -> t.getCryptocurrency().getSymbol()
+                .equalsIgnoreCase(cryptocurrencySymbol)) // Порівнюємо symbol
             .findFirst();
     }
 
     @Override
-    public void updateTransaction(String portfolioId, Transaction transaction) {
-        // Пошук транзакції за її ID
-        Optional<Transaction> existingTransaction = entities.stream()
-            .filter(t -> t.getId().equals(transaction.getId()))
-            .findFirst();
+    public void update(Transaction transaction) {
+        // Перевіряємо, чи транзакція валідна перед оновленням
+        if (!transaction.isValid()) {
+            throw new IllegalArgumentException(
+                "Транзакція містить невалідні дані: " + transaction.getErrors()
+            );
+        }
+
+        // Пошук існуючої транзакції
+        Optional<Transaction> existingTransaction = findById(transaction.getId());
 
         if (existingTransaction.isPresent()) {
             entities.remove(existingTransaction.get());
+            System.out.println(
+                "Існуюча транзакція з ID " + transaction.getId() + " була оновлена."
+            );
         } else {
             System.out.println(
-                "Увага: транзакція з ID " + transaction.getId() + " не знайдена. Додаємо нову.");
+                "Транзакція з ID " + transaction.getId() + " не знайдена. Буде додано нову."
+            );
         }
 
-        // Додавання (або оновлення) транзакції
+        // Додаємо оновлену транзакцію
         entities.add(transaction);
         saveChanges();
-        System.out.println("Транзакцію з ID " + transaction.getId() + " успішно оновлено.");
+        System.out.println("Транзакція з ID " + transaction.getId() + " успішно оновлена.");
+    }
+
+    @Override
+    public void delete(UUID transactionId) {
+        entities.removeIf(t -> t.getId().equals(transactionId));
+        saveChanges();
     }
 
 }
-*/

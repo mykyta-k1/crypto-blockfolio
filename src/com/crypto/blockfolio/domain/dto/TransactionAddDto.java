@@ -10,18 +10,24 @@ public class TransactionAddDto extends Entity {
 
     private final UUID cryptocurrencyId;
     private final TransactionType transactionType;
+    private final BigDecimal amount;
     private final BigDecimal costs;
     private final BigDecimal fees;
     private final String description;
 
     public TransactionAddDto(UUID id, UUID cryptocurrencyId, TransactionType transactionType,
-        BigDecimal costs, BigDecimal fees, String description) {
+        BigDecimal amount, BigDecimal costs, BigDecimal fees, String description) {
         super(id);
         this.cryptocurrencyId = cryptocurrencyId;
         this.transactionType = validateTransactionType(transactionType);
+        this.amount = validateAmount(amount);
         this.costs = validateCosts(costs);
         this.fees = validateFees(fees);
         this.description = validateDescription(description);
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException("Некоректні дані транзакції: " + errors);
+        }
     }
 
     private TransactionType validateTransactionType(TransactionType transactionType) {
@@ -29,6 +35,13 @@ public class TransactionAddDto extends Entity {
             errors.add(ErrorTemplates.REQUIRED.getTemplate().formatted("тип транзакції"));
         }
         return transactionType;
+    }
+
+    private BigDecimal validateAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("Кількість монет повинна бути більше 0.");
+        }
+        return amount;
     }
 
     private BigDecimal validateCosts(BigDecimal costs) {
@@ -52,23 +65,27 @@ public class TransactionAddDto extends Entity {
         return description != null ? description.trim() : null;
     }
 
-    public UUID cryptocurrencyId() {
+    public UUID getCryptocurrencyId() {
         return cryptocurrencyId;
     }
 
-    public TransactionType transactionType() {
+    public TransactionType getTransactionType() {
         return transactionType;
     }
 
-    public BigDecimal fosts() {
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public BigDecimal getCosts() {
         return costs;
     }
 
-    public BigDecimal fees() {
+    public BigDecimal getFees() {
         return fees;
     }
 
-    public String description() {
+    public String getDescription() {
         return description;
     }
 }

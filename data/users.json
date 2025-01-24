@@ -1,12 +1,12 @@
 [
   {
-    "password": "$2a$10$9wvF1cWqJc4oc7SG7Qt6KOR64oyvN8GKDvqtPSQEkcqqUrNMKLiRa",
-    "createdAt": "23-01-2025 00:53",
-    "username": "Mykyta",
-    "email": "c.kryvobokov.mykyta@student.uzhnu.edu.ua",
+    "password": "StrongPass1!",
+    "createdAt": "24-01-2025 12:53",
+    "username": "test_user",
+    "email": "test_user@example.com",
     "portfolios": [
-      "a66b6e25-79ad-4dfb-ac8c-f2d60780dec1"
+      "bb10b62c-7cca-4781-a9c0-30c4a71eae68"
     ],
-    "id": "55c5e1d1-c5a4-4379-86de-1aa369f3711d"
+    "id": "bdc31206-67c9-47c5-af1e-0371456a0e76"
   }
 ]

@@ -2,10 +2,13 @@ package com.crypto.blockfolio.persistence.entity;
 
 import com.crypto.blockfolio.persistence.Entity;
 import com.crypto.blockfolio.persistence.exception.EntityArgumentException;
+import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import com.crypto.blockfolio.persistence.validation.ValidationUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,20 +16,18 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
 
     private final UUID ownerId;
     private final LocalDateTime createdAt;
+    private final Map<Cryptocurrency, BigDecimal> balances; // Баланси криптовалют
+    private final Set<UUID> transactionsList; // Список транзакцій (за ID)
     private String name;
     private BigDecimal totalValue;
-    private Set<Cryptocurrency> watchlist;
-    private Set<Transaction> transactionsList;
 
-    public Portfolio(UUID id, UUID ownerId, String name,
-        Set<Cryptocurrency> watchlist, Set<Transaction> transactions) {
+    public Portfolio(UUID id, UUID ownerId, String name) {
         super(id);
         this.ownerId = ownerId;
         this.name = name;
         this.totalValue = BigDecimal.ZERO;
-        this.watchlist = watchlist != null ? new LinkedHashSet<>(watchlist) : new LinkedHashSet<>();
-        this.transactionsList =
-            transactions != null ? new LinkedHashSet<>(transactions) : new LinkedHashSet<>();
+        this.balances = new HashMap<>();
+        this.transactionsList = new LinkedHashSet<>();
         this.createdAt = LocalDateTime.now();
 
         if (!this.isValid()) {
@@ -34,67 +35,123 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         }
     }
 
-    public void addToWatchlist(Cryptocurrency cryptocurrency) {
-        errors.clear();
+    /**
+     * Додає криптовалюту до портфеля, якщо її ще немає в balances.
+     */
+    public void addCryptocurrency(Cryptocurrency cryptocurrency) {
         if (cryptocurrency == null || !cryptocurrency.isValid()) {
-            errors.add("Вибрана криптовалюта не є валідною.");
+            errors.add("Криптовалюта не є валідною.");
             return;
         }
-        if (!watchlist.add(cryptocurrency)) {
-            errors.add("Вибрана криптовалюта вже є у портфелі.");
+
+        balances.putIfAbsent(cryptocurrency, BigDecimal.ZERO); // Додаємо, якщо відсутня
+    }
+
+    public void removeCryptocurrency(Cryptocurrency cryptocurrency) {
+        if (cryptocurrency == null || !balances.containsKey(cryptocurrency)) {
+            errors.add("Криптовалюта не знайдена у портфелі.");
         } else {
-            calculateTotalValue();
+            balances.remove(cryptocurrency);
         }
     }
 
-    public void delFromWatchlist(Cryptocurrency cryptocurrency) {
-        if (cryptocurrency == null || !watchlist.remove(cryptocurrency)) {
-            errors.add("Вибрана криптовалюта не знайдена у портфелі.");
+    public void addTransaction(UUID transactionId, Cryptocurrency cryptocurrency, BigDecimal amount,
+        TransactionType transactionType) {
+        if (transactionId == null) {
+            errors.add("ID транзакції не може бути null.");
+            return;
+        }
+
+        if (cryptocurrency == null || !cryptocurrency.isValid()) {
+            errors.add("Криптовалюта не є валідною.");
+            return;
+        }
+
+        // Додаємо криптовалюту до портфеля, якщо її ще немає
+        balances.putIfAbsent(cryptocurrency, BigDecimal.ZERO);
+
+        // Додаємо транзакцію
+        if (transactionsList.add(transactionId)) {
+            // Оновлюємо баланс
+            BigDecimal currentBalance = balances.get(cryptocurrency);
+            BigDecimal updatedBalance = currentBalance.add(
+                transactionType == TransactionType.BUY ? amount : amount.negate()
+            );
+
+            balances.put(cryptocurrency, updatedBalance);
+            calculateTotalValue(); // Перераховуємо загальну вартість портфеля
         } else {
-            calculateTotalValue();
+            errors.add("Транзакція вже існує в портфелі.");
         }
     }
 
-    public void addTransactions(Transaction transaction) {
-        errors.clear();
-        if (transaction == null) {
-            errors.add("Транзакція не може бути null.");
-            return;
-        }
-        if (!transaction.isValid()) {
-            errors.add("Транзакція має помилки: " + transaction.getErrors());
-            return;
-        }
-        if (!transactionsList.add(transaction)) {
-            errors.add("Така транзакція вже існує.");
-        }
-    }
-
-    public void delTransactions(Transaction transaction) {
-        if (transaction == null || !transactionsList.remove(transaction)) {
-            errors.add("Така транзакція не знайдена.");
-        }
-        calculateTotalValue();
-    }
-
-    private LocalDateTime validateCreateAt(LocalDateTime createAt) {
-        if (createAt == null || createAt.isAfter(LocalDateTime.now())) {
-            errors.add("Дата створення не може бути в майбутньому або пустою.");
-        }
-
-        return createAt;
-    }
-
+    /**
+     * Оновлює загальну вартість портфеля на основі балансу криптовалют.
+     */
     public void calculateTotalValue() {
-        if (watchlist == null || watchlist.isEmpty()) {
-            this.totalValue = BigDecimal.ZERO;
-            return;
+        this.totalValue = balances.entrySet().stream()
+            .map(entry -> BigDecimal.valueOf(entry.getKey().getCurrentPrice())
+                .multiply(entry.getValue()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public boolean removeTransaction(UUID transactionId,
+        TransactionRepository transactionRepository) {
+        if (transactionId == null) {
+            errors.add("ID транзакції не може бути null.");
+            return false;
         }
 
-        this.totalValue = watchlist.stream()
-            .map(crypto -> BigDecimal.valueOf(crypto.getCurrentPrice())
-                .multiply(BigDecimal.valueOf(crypto.getCount())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Видаляємо транзакцію зі списку транзакцій портфоліо
+        boolean removed = transactionsList.remove(transactionId);
+        if (!removed) {
+            errors.add("Транзакція з ID " + transactionId + " не знайдена в портфоліо.");
+            return false;
+        }
+
+        // Якщо транзакцію видалено, оновлюємо баланси та загальну вартість
+        transactionRepository.findById(transactionId).ifPresent(transaction -> {
+            Cryptocurrency cryptocurrency = transaction.getCryptocurrency();
+
+            // Перераховуємо баланс відповідної криптовалюти
+            BigDecimal updatedBalance = calculateBalanceForCryptocurrency(cryptocurrency,
+                transactionRepository);
+
+            // Якщо баланс криптовалюти дорівнює 0, видаляємо криптовалюту з балансу
+            if (updatedBalance.compareTo(BigDecimal.ZERO) == 0) {
+                balances.remove(cryptocurrency);
+            } else {
+                balances.put(cryptocurrency, updatedBalance);
+            }
+
+            // Оновлюємо загальну вартість портфоліо
+            calculateTotalValue();
+        });
+
+        return true;
+    }
+
+    public BigDecimal calculateBalanceForCryptocurrency(Cryptocurrency cryptocurrency,
+        TransactionRepository transactionRepository) {
+        if (cryptocurrency == null) {
+            errors.add("Криптовалюта не може бути null.");
+            return BigDecimal.ZERO;
+        }
+
+        // Отримуємо всі релевантні транзакції для цієї криптовалюти
+        Set<Transaction> relevantTransactions = transactionRepository.findAll(transaction ->
+            transaction.getCryptocurrency().equals(cryptocurrency) &&
+                transactionsList.contains(transaction.getId())
+        );
+
+        // Обчислюємо баланс, враховуючи тип транзакції
+        return relevantTransactions.stream()
+            .map(transaction -> {
+                BigDecimal amount = transaction.getAmount();
+                return transaction.getTransactionType() == TransactionType.BUY ? amount
+                    : amount.negate();
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add); // Підсумовуємо всі значення
     }
 
     @Override
@@ -102,43 +159,17 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         return this.name.compareTo(o.name);
     }
 
+    // Гетери та сетери
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Set<Transaction> getTransactionsList() {
+    public Set<UUID> getTransactionsList() {
         return transactionsList;
     }
 
-    public void setTransactionsList(Set<Transaction> transactionsList) {
-        errors.clear();
-        if (transactionsList == null) {
-            errors.add("Список транзакцій не може бути null.");
-            return;
-        }
-
-        for (Transaction transaction : transactionsList) {
-            if (transaction == null || !transaction.isValid()) {
-                errors.add("Список транзакцій містить некоректну транзакцію: " +
-                    (transaction != null ? transaction.getErrors() : "null"));
-                return;
-            }
-        }
-
-        this.transactionsList = new LinkedHashSet<>(transactionsList);
-        calculateTotalValue();
-    }
-
-    public void setTransactions(Set<Transaction> transactionsList) {
-        this.transactionsList = transactionsList;
-    }
-
-    public Set<Cryptocurrency> getWatchlist() {
-        return watchlist;
-    }
-
-    public void setWatchlist(Set<Cryptocurrency> watchlist) {
-        this.watchlist = watchlist;
+    public Map<Cryptocurrency, BigDecimal> getBalances() {
+        return balances;
     }
 
     public UUID getOwnerId() {
@@ -155,21 +186,11 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
 
         ValidationUtils.validateRequired(name, templateName, errors);
         ValidationUtils.validateLength(name, 1, 64, templateName, errors);
-        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9_]+$", templateName, errors);
         this.name = name;
     }
 
     public BigDecimal getTotalValue() {
         return totalValue;
-    }
-
-    public void setTotalValue(BigDecimal totalValue) {
-        errors.clear();
-        if (totalValue == null || totalValue.compareTo(BigDecimal.ZERO) < 0) {
-            errors.add("Загальна вартість не може бути null або менше 0.");
-            return;
-        }
-        this.totalValue = totalValue;
     }
 
     @Override
@@ -179,7 +200,7 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
             ", totalValue=" + totalValue +
             ", owner=" + ownerId +
             ", createdAt=" + createdAt +
-            ", watchlist=" + watchlist +
+            ", balances=" + balances +
             ", transactionsList=" + transactionsList +
             '}';
     }

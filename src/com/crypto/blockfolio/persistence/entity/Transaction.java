@@ -10,25 +10,27 @@ import java.util.UUID;
 
 public class Transaction extends Entity implements Comparable<Transaction> {
 
+    private LocalDateTime createdAt;
     private Cryptocurrency cryptocurrency;
     private TransactionType transactionType;
+    private BigDecimal amount;
     private BigDecimal costs;
     private BigDecimal profit;
     private BigDecimal fees;
     private String description;
-    private LocalDateTime createAt;
 
     public Transaction(UUID id, Cryptocurrency cryptocurrency, TransactionType transactionType,
-        BigDecimal costs, BigDecimal profit, BigDecimal fees, String description,
-        LocalDateTime createAt) {
+        BigDecimal amount, BigDecimal costs, BigDecimal profit, BigDecimal fees, String description,
+        LocalDateTime createdAt) {
         super(id);
         setCryptocurrency(cryptocurrency);
         setTransactionType(transactionType);
+        setAmount(amount);
         setCosts(costs);
         this.profit = profit;
         this.fees = fees;
         this.description = description;
-        this.createAt = validateCreateAt(createAt);
+        this.createdAt = validateCreatedAt(createdAt);
 
         if (!this.isValid()) {
             System.err.println("Помилки транзакції: " + errors);
@@ -38,7 +40,7 @@ public class Transaction extends Entity implements Comparable<Transaction> {
 
     @Override
     public int compareTo(Transaction o) {
-        return this.createAt.compareTo(o.createAt);
+        return this.createdAt.compareTo(o.createdAt);
     }
 
     public Cryptocurrency getCryptocurrency() {
@@ -72,16 +74,22 @@ public class Transaction extends Entity implements Comparable<Transaction> {
     }
 
     public void setCosts(BigDecimal costs) {
-        final String templateCosts = "витрат";
-
-        if (costs == null) {
-            errors.add(ErrorTemplates.REQUIRED.getTemplate().formatted(templateCosts));
-        } else if (costs.compareTo(BigDecimal.ZERO) < 0) {
+        if (costs == null || costs.compareTo(BigDecimal.ZERO) < 0) {
             errors.add("Витрати не можуть бути від'ємними.");
         }
-
         this.costs = costs;
-        calculatePnl();
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("Кількість монет має бути більше 0.");
+        } else {
+            this.amount = amount;
+        }
     }
 
     public BigDecimal getProfit() {
@@ -89,11 +97,10 @@ public class Transaction extends Entity implements Comparable<Transaction> {
     }
 
     public void setProfit(BigDecimal profit) {
-        if (transactionType == TransactionType.SELL) {
-            this.profit = calculatePnl();
-        } else {
-            this.profit = BigDecimal.ZERO;
+        if (profit != null && profit.compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Прибуток не може бути від’ємним.");
         }
+        this.profit = profit;
     }
 
     public BigDecimal getFees() {
@@ -101,47 +108,34 @@ public class Transaction extends Entity implements Comparable<Transaction> {
     }
 
     public void setFees(BigDecimal fees) {
-        final String templateFees = "комісії";
-
-        if (fees == null) {
-            errors.add(ErrorTemplates.REQUIRED.getTemplate().formatted(templateFees));
-        } else if (fees.compareTo(BigDecimal.ZERO) < 0) {
-            errors.add("Комісії не можуть бути від'ємним.");
+        if (fees == null || fees.compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Комісії не можуть бути від'ємними.");
         }
-
         this.fees = fees;
     }
 
     public BigDecimal calculatePnl() {
-        if (cryptocurrency == null || cryptocurrency.getCurrentPrice() <= 0 || costs == null
+        if (cryptocurrency == null || cryptocurrency.getCurrentPrice() <= 0 || amount == null
             || fees == null) {
-            return BigDecimal.ZERO; // Повертаємо 0, якщо дані для розрахунку неповні.
+            return BigDecimal.ZERO;
         }
+
+        BigDecimal currentValue = BigDecimal.valueOf(cryptocurrency.getCurrentPrice())
+            .multiply(amount);
 
         switch (transactionType) {
             case BUY:
-                // Для купівлі PNL розраховується як unrealized profit/loss
-                BigDecimal currentValue = BigDecimal.valueOf(cryptocurrency.getCurrentPrice())
-                    .multiply(BigDecimal.valueOf(cryptocurrency.getCount()));
-                return currentValue
-                    .subtract(costs)
-                    .subtract(fees)
+                return currentValue.subtract(costs).subtract(fees)
                     .setScale(2, RoundingMode.HALF_UP);
 
             case SELL:
-                // Для продажу PNL = profit - costs - fees
-                return profit
-                    .subtract(costs)
-                    .subtract(fees)
-                    .setScale(2, RoundingMode.HALF_UP);
+                return profit.subtract(costs).subtract(fees).setScale(2, RoundingMode.HALF_UP);
 
             case TRANSFER_WITHDRAWAL:
                 return costs.negate().setScale(2, RoundingMode.HALF_UP);
 
             case TRANSFER_DEPOSIT:
-                return BigDecimal.valueOf(cryptocurrency.getCurrentPrice())
-                    .multiply(BigDecimal.valueOf(cryptocurrency.getCount()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                return currentValue.setScale(2, RoundingMode.HALF_UP);
 
             default:
                 return BigDecimal.ZERO;
@@ -159,20 +153,19 @@ public class Transaction extends Entity implements Comparable<Transaction> {
         this.description = description != null ? description.trim() : null;
     }
 
-    public LocalDateTime getCreateAt() {
-        return createAt;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = validateCreatedAt(createdAt);
     }
 
-    private LocalDateTime validateCreateAt(LocalDateTime createAt) {
-        if (createAt == null || createAt.isAfter(LocalDateTime.now())) {
+    private LocalDateTime validateCreatedAt(LocalDateTime createdAt) {
+        if (createdAt == null || createdAt.isAfter(LocalDateTime.now())) {
             errors.add("Дата створення не може бути в майбутньому або пустою.");
         }
-
-        return createAt;
+        return createdAt;
     }
 
     @Override
@@ -180,11 +173,12 @@ public class Transaction extends Entity implements Comparable<Transaction> {
         return "Transaction{" +
             "cryptocurrency=" + (cryptocurrency != null ? cryptocurrency.getName() : "null") +
             ", transactionType=" + transactionType +
+            ", amount=" + amount +
             ", costs=" + costs +
             ", profit=" + profit +
             ", fees=" + fees +
             ", description='" + description + '\'' +
-            ", createAt=" + createAt +
+            ", createdAt=" + createdAt +
             '}';
     }
 }

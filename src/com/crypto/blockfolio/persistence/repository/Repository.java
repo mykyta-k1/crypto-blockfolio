@@ -1,14 +1,12 @@
 package com.crypto.blockfolio.persistence.repository;
 
-import com.crypto.blockfolio.persistence.Entity;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 
-public interface Repository<E extends Entity> {
+public interface Repository<E, ID> {
 
-    Optional<E> findById(UUID id);
+    Optional<E> findById(ID id);
 
     Set<E> findAll();
 
