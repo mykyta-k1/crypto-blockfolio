@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-class AbstractJsonRepository<E extends Identifiable<ID>, ID> implements Repository<E, ID> {
+class GenericJsonRepository<E extends Identifiable<ID>, ID> implements Repository<E, ID> {
 
     protected final Set<E> entities;
     private final Function<E, ID> identifierExtractor;
@@ -27,7 +27,7 @@ class AbstractJsonRepository<E extends Identifiable<ID>, ID> implements Reposito
     private final Path path;
     private final Type collectionType;
 
-    AbstractJsonRepository(Gson gson, Path path, Type collectionType,
+    GenericJsonRepository(Gson gson, Path path, Type collectionType,
         Function<E, ID> identifierExtractor) {
         this.gson = gson;
         this.path = path;

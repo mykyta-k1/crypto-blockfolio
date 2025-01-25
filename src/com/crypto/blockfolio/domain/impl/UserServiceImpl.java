@@ -22,8 +22,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.mindrot.bcrypt.BCrypt;
 
-
-public class UserServiceImpl extends GenericService<User, UUID> implements UserService {
+class UserServiceImpl extends GenericService<User, UUID> implements UserService {
 
     private final UserRepository userRepository;
 
@@ -68,7 +67,6 @@ public class UserServiceImpl extends GenericService<User, UUID> implements UserS
         }
 
         try {
-            System.out.println("Додаємо користувача до репозиторію: " + userAddDto);
             User user = new User(
                 userAddDto.getId(),
                 BCrypt.hashpw(userAddDto.getRawPassword(), BCrypt.gensalt()), // Хешування пароля
@@ -76,7 +74,6 @@ public class UserServiceImpl extends GenericService<User, UUID> implements UserS
                 userAddDto.getEmail()
             );
             userRepository.add(user);
-            System.out.println("Користувач успішно доданий: " + user);
             return user;
         } catch (Exception e) {
             throw new SignUpException("Помилка при створенні користувача: %s"
@@ -122,8 +119,8 @@ public class UserServiceImpl extends GenericService<User, UUID> implements UserS
             workbook.write(outputStream);
             workbook.close();
         } catch (IOException e) {
-            throw new SignUpException("Помилка при збереженні звіту користувачів: %s"
-                .formatted(e.getMessage()));
+            throw new SignUpException(
+                "Помилка при збереженні звіту користувачів: %s".formatted(e.getMessage()));
         }
     }
 }

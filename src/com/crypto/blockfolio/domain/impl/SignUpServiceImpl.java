@@ -1,5 +1,6 @@
 package com.crypto.blockfolio.domain.impl;
 
+import com.crypto.blockfolio.domain.contract.AuthService;
 import com.crypto.blockfolio.domain.contract.SignUpService;
 import com.crypto.blockfolio.domain.contract.UserService;
 import com.crypto.blockfolio.domain.dto.UserAddDto;
@@ -17,14 +18,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-public class SignUpServiceImpl implements SignUpService {
+class SignUpServiceImpl implements SignUpService {
 
     private static final int VERIFICATION_CODE_EXPIRATION_MINUTES = 1;
     private static LocalDateTime codeCreationTime;
     private final UserService userService;
+    private final AuthService authService;
 
-    public SignUpServiceImpl(UserService userService) {
+    public SignUpServiceImpl(UserService userService, AuthService authService) {
         this.userService = userService;
+        this.authService = authService;
     }
 
     // відправлення на пошту
@@ -46,23 +49,12 @@ public class SignUpServiceImpl implements SignUpService {
         });
 
         try {
-            // Створення об'єкта MimeMessage
             Message message = new MimeMessage(session);
-
-            // Встановлення відправника
             message.setFrom(new InternetAddress(
                 "c.kryvobokov.mykyta@student.uzhnu.edu.ua")); // Замініть на власну адресу
-
-            // Встановлення отримувача
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-
-            // Встановлення теми
             message.setSubject("Код підтвердження");
-
-            // Встановлення тексту повідомлення
             message.setText("Ваш код підтвердження: " + verificationCode);
-
-            // Відправлення повідомлення
             Transport.send(message);
 
             System.out.println("Повідомлення успішно відправлено.");
@@ -101,12 +93,33 @@ public class SignUpServiceImpl implements SignUpService {
         codeCreationTime = null;
     }
 
+    @Override
+    public boolean userExists(String username, String email) {
+        boolean usernameExists = userService.getAll().stream()
+            .anyMatch(user -> user.getUsername().equals(username));
+        boolean emailExists = userService.getAll().stream()
+            .anyMatch(user -> user.getEmail().equals(email));
+        return usernameExists || emailExists;
+    }
+
+    @Override
     public void signUp(UserAddDto userAddDto, Supplier<String> waitForUserInput) {
+        if (userExists(userAddDto.getUsername(), userAddDto.getEmail())) {
+            throw new SignUpException("Користувач із таким логіном або email вже існує.");
+        }
+
         String verificationCode = generateAndSendVerificationCode(userAddDto.getEmail());
         String userInputCode = waitForUserInput.get();
 
         verifyCode(userInputCode, verificationCode);
 
         userService.add(userAddDto);
+
+        boolean isAuthenticated = authService.authenticate(userAddDto.getUsername(),
+            userAddDto.getRawPassword());
+        if (!isAuthenticated) {
+            throw new SignUpException("Помилка під час авторизації після реєстрації.");
+        }
     }
+
 }

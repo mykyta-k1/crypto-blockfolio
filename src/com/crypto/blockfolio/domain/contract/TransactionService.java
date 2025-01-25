@@ -4,12 +4,14 @@ import com.crypto.blockfolio.domain.Reportable;
 import com.crypto.blockfolio.domain.Service;
 import com.crypto.blockfolio.domain.dto.TransactionAddDto;
 import com.crypto.blockfolio.persistence.entity.Transaction;
+import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
 import java.util.List;
 import java.util.UUID;
 
 public interface TransactionService extends Service<Transaction, UUID>, Reportable<Transaction> {
 
-    Transaction addTransaction(TransactionAddDto transactionAddDto);
+    Transaction addTransaction(TransactionAddDto transactionAddDto,
+        CryptocurrencyRepository cryptocurrencyRepository);
 
     Transaction getTransactionById(UUID id);
 

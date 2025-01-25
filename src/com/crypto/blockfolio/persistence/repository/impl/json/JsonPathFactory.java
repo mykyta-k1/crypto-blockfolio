@@ -7,7 +7,7 @@ enum JsonPathFactory {
     USERS_FILE("users.json"),
     PORTFOLIOS_FILE("portfolios.json"),
     TRANSACTIONS_FILE("transactions.json"),
-    CRYPTOCURRENCY_FILE("cryptocurrency.json");
+    CRYPTOCURRENCIES_FILE("cryptocurrencies.json");
 
     private static final String DATA_DIRECTORY = "data";
     private final String fileName;

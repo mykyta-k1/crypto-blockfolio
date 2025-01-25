@@ -12,4 +12,3 @@ public interface CryptocurrencyService extends Service<Cryptocurrency, String>,
 
     Cryptocurrency addCryptocurrency(CryptocurrencyAddDto cryptocurrencyAddDto);
 }
-

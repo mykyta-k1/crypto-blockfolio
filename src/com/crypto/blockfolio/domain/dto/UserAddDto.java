@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class UserAddDto extends Entity {
+public final class UserAddDto extends Entity {
 
     private final String username;
     private final String rawPassword;

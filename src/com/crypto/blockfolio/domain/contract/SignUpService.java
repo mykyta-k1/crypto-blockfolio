@@ -6,4 +6,6 @@ import java.util.function.Supplier;
 public interface SignUpService {
 
     void signUp(UserAddDto userAddDto, Supplier<String> waitForUserInput);
+
+    boolean userExists(String username, String email);
 }

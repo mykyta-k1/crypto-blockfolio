@@ -1,10 +1,9 @@
 package com.crypto.blockfolio.domain.dto;
 
 import com.crypto.blockfolio.persistence.CryptoEntity;
-import com.crypto.blockfolio.persistence.validation.ValidationUtils;
 import java.time.LocalDateTime;
 
-public class CryptocurrencyAddDto extends CryptoEntity {
+public final class CryptocurrencyAddDto extends CryptoEntity {
 
     private final double currentPrice;
     private final double marketCap;
@@ -16,27 +15,12 @@ public class CryptocurrencyAddDto extends CryptoEntity {
         String symbol, String name, double currentPrice, double marketCap,
         double volume24h, double percentChange24h, LocalDateTime lastUpdated
     ) {
-        super(symbol,
-            name); // Ідентифікатор для `Cryptocurrency` не потрібен, використовуємо символ.
+        super(symbol, name);
         this.currentPrice = validatePositiveNumber(currentPrice, "Ціна");
         this.marketCap = validatePositiveNumber(marketCap, "Ринкова капіталізація");
         this.volume24h = validatePositiveNumber(volume24h, "Обсяг торгів за 24 години");
-        this.percentChange24h = percentChange24h; // Відсоткова зміна може бути від'ємною
+        this.percentChange24h = percentChange24h;
         this.lastUpdated = validateLastUpdated(lastUpdated);
-    }
-
-    private String validateSymbol(String symbol) {
-        ValidationUtils.validateRequired(symbol, "Символ монети", errors);
-        ValidationUtils.validateLength(symbol, 1, 10, "Символ монети", errors);
-        ValidationUtils.validatePattern(symbol, "^[A-Z0-9]+$", "Символ монети", errors);
-        return symbol;
-    }
-
-    private String validateName(String name) {
-        ValidationUtils.validateRequired(name, "Назва монети", errors);
-        ValidationUtils.validateLength(name, 2, 50, "Назва монети", errors);
-        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9\\s]+$", "Назва монети", errors);
-        return name;
     }
 
     private double validatePositiveNumber(double value, String fieldName) {

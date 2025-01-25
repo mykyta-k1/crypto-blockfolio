@@ -6,19 +6,26 @@ import com.crypto.blockfolio.persistence.entity.TransactionType;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class TransactionAddDto extends Entity {
+public final class TransactionAddDto extends Entity {
 
-    private final UUID cryptocurrencyId;
+    private final String cryptocurrencySymbol;
     private final TransactionType transactionType;
     private final BigDecimal amount;
     private final BigDecimal costs;
     private final BigDecimal fees;
     private final String description;
 
-    public TransactionAddDto(UUID id, UUID cryptocurrencyId, TransactionType transactionType,
-        BigDecimal amount, BigDecimal costs, BigDecimal fees, String description) {
+    public TransactionAddDto(
+        UUID id,
+        String cryptocurrencySymbol,
+        TransactionType transactionType,
+        BigDecimal amount,
+        BigDecimal costs,
+        BigDecimal fees,
+        String description
+    ) {
         super(id);
-        this.cryptocurrencyId = cryptocurrencyId;
+        this.cryptocurrencySymbol = validateCryptocurrencySymbol(cryptocurrencySymbol);
         this.transactionType = validateTransactionType(transactionType);
         this.amount = validateAmount(amount);
         this.costs = validateCosts(costs);
@@ -28,6 +35,13 @@ public class TransactionAddDto extends Entity {
         if (!errors.isEmpty()) {
             throw new IllegalArgumentException("Некоректні дані транзакції: " + errors);
         }
+    }
+
+    private String validateCryptocurrencySymbol(String symbol) {
+        if (symbol == null || symbol.trim().isEmpty()) {
+            errors.add("Символ криптовалюти не може бути порожнім.");
+        }
+        return symbol != null ? symbol.trim() : null;
     }
 
     private TransactionType validateTransactionType(TransactionType transactionType) {
@@ -65,8 +79,8 @@ public class TransactionAddDto extends Entity {
         return description != null ? description.trim() : null;
     }
 
-    public UUID getCryptocurrencyId() {
-        return cryptocurrencyId;
+    public String getCryptocurrencySymbol() {
+        return cryptocurrencySymbol;
     }
 
     public TransactionType getTransactionType() {

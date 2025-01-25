@@ -9,16 +9,15 @@ import com.crypto.blockfolio.persistence.repository.contracts.TransactionReposit
 import com.crypto.blockfolio.persistence.repository.contracts.UserRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Set;
 
 public class JsonRepositoryFactory extends RepositoryFactory {
@@ -30,36 +29,41 @@ public class JsonRepositoryFactory extends RepositoryFactory {
     private final TransactionJsonRepositoryImpl transactionJsonRepositoryImpl;
 
     private JsonRepositoryFactory() {
-        // Адаптер для типу даних LocalDateTime при серіалізації/десеріалізації
+        // Налаштування Gson
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class,
-            (JsonSerializer<LocalDateTime>) (localDate, srcType, context) ->
-                new JsonPrimitive(
-                    DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").format(localDate)));
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class,
-            (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) ->
-                LocalDateTime.parse(json.getAsString(),
-                    DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
-                        .withLocale(Locale.of("uk", "UA"))));
 
-        // Адаптер для типу даних LocalDate при серіалізації/десеріалізації
-        gsonBuilder.registerTypeAdapter(LocalDate.class,
-            (JsonSerializer<LocalDate>) (localDate, srcType, context) ->
-                new JsonPrimitive(
-                    DateTimeFormatter.ofPattern("dd-MM-yyyy").format(localDate)));
-        gsonBuilder.registerTypeAdapter(LocalDate.class,
-            (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
-                LocalDate.parse(json.getAsString(),
-                    DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                        .withLocale(Locale.of("uk", "UA"))));
+        // Реєстрація адаптерів
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new TypeAdapter<LocalDateTime>() {
+            @Override
+            public void write(JsonWriter out, LocalDateTime value) throws IOException {
+                out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            }
+
+            @Override
+            public LocalDateTime read(JsonReader in) throws IOException {
+                return LocalDateTime.parse(in.nextString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            }
+        });
+
+        gsonBuilder.registerTypeAdapter(LocalDate.class, new TypeAdapter<LocalDate>() {
+            @Override
+            public void write(JsonWriter out, LocalDate value) throws IOException {
+                out.value(value.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            }
+
+            @Override
+            public LocalDate read(JsonReader in) throws IOException {
+                return LocalDate.parse(in.nextString(), DateTimeFormatter.ISO_LOCAL_DATE);
+            }
+        });
 
         gson = gsonBuilder.setPrettyPrinting().create();
 
-        userJsonRepositoryImpl = new UserJsonRepositoryImpl(gson);
+        // Ініціалізація репозиторіїв
         cryptocurrencyJsonRepositoryImpl = new CryptocurrencyJsonRepositoryImpl(gson);
-        portfolioJsonRepositoryImpl = new PortfolioJsonRepositoryImpl(gson,
-            getTransactionRepository());
+        portfolioJsonRepositoryImpl = new PortfolioJsonRepositoryImpl(gson);
         transactionJsonRepositoryImpl = new TransactionJsonRepositoryImpl(gson);
+        userJsonRepositoryImpl = new UserJsonRepositoryImpl(gson);
     }
 
     public static JsonRepositoryFactory getInstance() {
@@ -98,13 +102,12 @@ public class JsonRepositoryFactory extends RepositoryFactory {
 
     private <E extends Identifiable<ID>, ID> void serializeEntities(Path path, Set<E> entities) {
         try (FileWriter writer = new FileWriter(path.toFile())) {
-            // Скидуємо файлик, перед збереженням!
+            // Скидуємо файл перед збереженням
             writer.write("");
-            // Перетворюємо колекцію користувачів в JSON та записуємо у файл
+            // Перетворення колекції у JSON та запис у файл
             gson.toJson(entities, writer);
-
         } catch (IOException e) {
-            throw new JsonFileIOException("Не вдалось зберегти дані у json-файл. Детальніше: %s"
+            throw new JsonFileIOException("Не вдалося зберегти дані у json-файл. Детальніше: %s"
                 .formatted(e.getMessage()));
         }
     }

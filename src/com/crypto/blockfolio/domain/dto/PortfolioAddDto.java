@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class PortfolioAddDto extends Entity {
+public final class PortfolioAddDto extends Entity {
 
     private final UUID ownerId;
     private final String name;
@@ -41,7 +41,7 @@ public class PortfolioAddDto extends Entity {
     private String validateName(String name) {
         ValidationUtils.validateRequired(name, "назва портфоліо", errors);
         ValidationUtils.validateLength(name, 1, 64, "назва портфоліо", errors);
-        ValidationUtils.validatePattern(name, "^[a-zA-Z0-9_]+$", "назва портфоліо", errors);
+        ValidationUtils.validatePattern(name, "[A-Za-z0-9_ ]+", "назва портфоліо", errors);
         return name;
     }
 
@@ -78,4 +78,5 @@ public class PortfolioAddDto extends Entity {
     public Set<UUID> getTransactionIds() {
         return transactionIds;
     }
+    
 }

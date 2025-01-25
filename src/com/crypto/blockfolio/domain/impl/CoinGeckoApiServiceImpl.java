@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
+class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
 
     private static final String API_BASE_URL = "https://api.coingecko.com/api/v3";
     private static final Gson GSON = new Gson();
@@ -28,7 +28,7 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
     public Cryptocurrency getCryptocurrencyInfo(String name) {
         String cacheKey = "coin_" + name.toLowerCase();
 
-        // Спроба отримати дані з кешу
+        // Перевірка в кеші
         Optional<Cryptocurrency> cachedData = getCachedData(cacheKey);
         if (cachedData.isPresent()) {
             return cachedData.get();
@@ -40,7 +40,7 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
             JsonObject jsonResponse = makeApiRequest(endpoint).getAsJsonObject();
             Cryptocurrency cryptocurrency = mapJsonToCryptocurrency(jsonResponse);
 
-            // Збереження даних у кеш
+            // Додавання до кешу
             putCachedData(cacheKey, cryptocurrency);
 
             return cryptocurrency;
@@ -53,7 +53,7 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
     public List<Cryptocurrency> getAllCryptocurrencies() {
         String cacheKey = "all_coins";
 
-        // Спроба отримати дані з кешу
+        // Перевірка в кеші
         Optional<List<Cryptocurrency>> cachedData = getCachedData(cacheKey);
         if (cachedData.isPresent()) {
             return cachedData.get();
@@ -78,7 +78,7 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
                 ));
             }
 
-            // Збереження даних у кеш
+            // Додавання до кешу
             putCachedData(cacheKey, cryptocurrencies);
 
             return cryptocurrencies;
@@ -87,6 +87,9 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
         }
     }
 
+    /**
+     * Метод для здійснення HTTP-запиту до API.
+     */
     private JsonElement makeApiRequest(String endpoint) throws Exception {
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -103,41 +106,23 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
         }
     }
 
+    /**
+     * Метод для мапінгу JSON-об'єкта в сутність `Cryptocurrency`.
+     */
     private Cryptocurrency mapJsonToCryptocurrency(JsonObject jsonObject) {
         try {
-            String symbol = jsonObject.get("symbol").getAsString().toUpperCase();
-            String name = jsonObject.get("name").getAsString();
-
-            double currentPrice =
-                jsonObject.has("current_price") ? jsonObject.get("current_price").getAsDouble()
-                    : 0.0;
-
-            double marketCap =
-                jsonObject.has("market_cap") ? jsonObject.get("market_cap").getAsDouble() : 0.0;
-
-            double totalVolume =
-                jsonObject.has("total_volume") ? jsonObject.get("total_volume").getAsDouble() : 0.0;
-
-            double priceChange24h =
-                jsonObject.has("price_change_24h") ? jsonObject.get("price_change_24h")
-                    .getAsDouble() : 0.0;
-
-            double priceChangePercentage24h =
-                jsonObject.has("price_change_percentage_24h") ? jsonObject.get(
-                    "price_change_percentage_24h").getAsDouble() : 0.0;
-
-            LocalDateTime lastUpdated = jsonObject.has("last_updated")
-                ? LocalDateTime.parse(jsonObject.get("last_updated").getAsString().replace("Z", ""))
-                : LocalDateTime.now();
-
             return new Cryptocurrency(
-                symbol,
-                name,
-                currentPrice,
-                marketCap,
-                totalVolume,
-                priceChangePercentage24h,
-                lastUpdated
+                jsonObject.get("symbol").getAsString().toUpperCase(),
+                jsonObject.get("name").getAsString(),
+                jsonObject.get("market_data").getAsJsonObject().get("current_price")
+                    .getAsJsonObject().get("usd").getAsDouble(),
+                jsonObject.get("market_data").getAsJsonObject().get("market_cap")
+                    .getAsJsonObject().get("usd").getAsDouble(),
+                jsonObject.get("market_data").getAsJsonObject().get("total_volume")
+                    .getAsJsonObject().get("usd").getAsDouble(),
+                jsonObject.get("market_data").getAsJsonObject()
+                    .get("price_change_percentage_24h").getAsDouble(),
+                LocalDateTime.now()
             );
         } catch (Exception e) {
             System.err.println("Помилка обробки JSON: " + jsonObject);
@@ -145,9 +130,8 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
         }
     }
 
-
     /**
-     * Методи кешування відповіді від апі
+     * Методи кешування для зберігання даних.
      */
     private <T> Optional<T> getCachedData(String key) {
         CacheEntry entry = cache.get(key);
@@ -155,6 +139,7 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
             cache.remove(key);
             return Optional.empty();
         }
+        System.out.println("[CASH] Used");
         return Optional.of((T) entry.getData());
     }
 
@@ -162,6 +147,9 @@ public class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
         cache.put(key, new CacheEntry(data));
     }
 
+    /**
+     * Внутрішній клас для кешування даних.
+     */
     private static class CacheEntry {
 
         private final Object data;

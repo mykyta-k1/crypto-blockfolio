@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class Transaction extends Entity implements Comparable<Transaction> {
 
+    private UUID portfolioId;
     private LocalDateTime createdAt;
     private Cryptocurrency cryptocurrency;
     private TransactionType transactionType;
@@ -180,5 +181,13 @@ public class Transaction extends Entity implements Comparable<Transaction> {
             ", description='" + description + '\'' +
             ", createdAt=" + createdAt +
             '}';
+    }
+
+    public UUID getPortfolioId() {
+        return portfolioId;
+    }
+
+    public void setPortfolioId(UUID portfolioId) {
+        this.portfolioId = portfolioId;
     }
 }

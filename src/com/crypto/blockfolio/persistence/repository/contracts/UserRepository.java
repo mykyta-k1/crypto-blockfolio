@@ -22,3 +22,5 @@ public interface UserRepository extends Repository<User, UUID> {
 
     Set<UUID> getPortfolios(UUID userId);
 }
+
+

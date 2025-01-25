@@ -7,7 +7,7 @@ import com.crypto.blockfolio.persistence.entity.User;
 import com.crypto.blockfolio.persistence.repository.contracts.UserRepository;
 import org.mindrot.bcrypt.BCrypt;
 
-final class AuthServiceImpl implements AuthService {
+class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private User user;
