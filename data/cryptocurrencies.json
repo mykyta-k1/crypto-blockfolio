@@ -1,0 +1,902 @@
+[
+  {
+    "currentPrice": 104888.0,
+    "marketCap": 2.078156834527E12,
+    "volume24h": 2.3651477753E10,
+    "percentChange24h": -0.15973,
+    "lastUpdated": "2025-01-25T23:17:32.0813024",
+    "symbol": "BTC",
+    "name": "Bitcoin"
+  },
+  {
+    "currentPrice": 3334.93,
+    "marketCap": 4.01864346205E11,
+    "volume24h": 1.3882132884E10,
+    "percentChange24h": 0.05327,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "ETH",
+    "name": "Ethereum"
+  },
+  {
+    "currentPrice": 3.12,
+    "marketCap": 1.79851799542E11,
+    "volume24h": 3.22091892E9,
+    "percentChange24h": 0.49695,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "XRP",
+    "name": "XRP"
+  },
+  {
+    "currentPrice": 0.999771,
+    "marketCap": 1.39298163185E11,
+    "volume24h": 3.524694902E10,
+    "percentChange24h": -0.03655,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "USDT",
+    "name": "Tether"
+  },
+  {
+    "currentPrice": 258.41,
+    "marketCap": 1.25734947913E11,
+    "volume24h": 6.221674203E9,
+    "percentChange24h": 0.50656,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "SOL",
+    "name": "Solana"
+  },
+  {
+    "currentPrice": 687.64,
+    "marketCap": 1.00269120094E11,
+    "volume24h": 4.91496392E8,
+    "percentChange24h": 1.06471,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "BNB",
+    "name": "BNB"
+  },
+  {
+    "currentPrice": 0.356791,
+    "marketCap": 5.2715983784E10,
+    "volume24h": 1.501641789E9,
+    "percentChange24h": 1.06327,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "DOGE",
+    "name": "Dogecoin"
+  },
+  {
+    "currentPrice": 1.0,
+    "marketCap": 5.2182317438E10,
+    "volume24h": 4.826863171E9,
+    "percentChange24h": 0.0028,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "USDC",
+    "name": "USDC"
+  },
+  {
+    "currentPrice": 0.980626,
+    "marketCap": 3.5191361762E10,
+    "volume24h": 5.5598398E8,
+    "percentChange24h": 0.81157,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "ADA",
+    "name": "Cardano"
+  },
+  {
+    "currentPrice": 3332.31,
+    "marketCap": 3.1844018222E10,
+    "volume24h": 5.7607129E7,
+    "percentChange24h": 0.144,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "STETH",
+    "name": "Lido Staked Ether"
+  },
+  {
+    "currentPrice": 0.253244,
+    "marketCap": 2.18123954E10,
+    "volume24h": 5.76057177E8,
+    "percentChange24h": -0.79761,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "TRX",
+    "name": "TRON"
+  },
+  {
+    "currentPrice": 25.11,
+    "marketCap": 1.6032472224E10,
+    "volume24h": 5.86849698E8,
+    "percentChange24h": -0.95632,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "LINK",
+    "name": "Chainlink"
+  },
+  {
+    "currentPrice": 36.79,
+    "marketCap": 1.5194293339E10,
+    "volume24h": 6.59288297E8,
+    "percentChange24h": 3.44437,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "AVAX",
+    "name": "Avalanche"
+  },
+  {
+    "currentPrice": 3970.32,
+    "marketCap": 1.3737853164E10,
+    "volume24h": 3.7171183E7,
+    "percentChange24h": -0.29696,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "WSTETH",
+    "name": "Wrapped stETH"
+  },
+  {
+    "currentPrice": 104640.0,
+    "marketCap": 1.3510988484E10,
+    "volume24h": 2.3079517E8,
+    "percentChange24h": -0.23576,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "WBTC",
+    "name": "Wrapped Bitcoin"
+  },
+  {
+    "currentPrice": 0.418774,
+    "marketCap": 1.2781525344E10,
+    "volume24h": 2.81590742E8,
+    "percentChange24h": -2.93918,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "XLM",
+    "name": "Stellar"
+  },
+  {
+    "currentPrice": 0.33241,
+    "marketCap": 1.2720316092E10,
+    "volume24h": 3.47413359E8,
+    "percentChange24h": 0.32628,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "HBAR",
+    "name": "Hedera"
+  },
+  {
+    "currentPrice": 5.08,
+    "marketCap": 1.2638394897E10,
+    "volume24h": 1.42629829E8,
+    "percentChange24h": -0.25123,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "TON",
+    "name": "Toncoin"
+  },
+  {
+    "currentPrice": 4.14,
+    "marketCap": 1.2467600832E10,
+    "volume24h": 8.11868255E8,
+    "percentChange24h": -2.00954,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "SUI",
+    "name": "Sui"
+  },
+  {
+    "currentPrice": 2.006E-5,
+    "marketCap": 1.182198494E10,
+    "volume24h": 1.93522758E8,
+    "percentChange24h": 0.59603,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "SHIB",
+    "name": "Shiba Inu"
+  },
+  {
+    "currentPrice": 3335.85,
+    "marketCap": 1.0024439549E10,
+    "volume24h": 6.91153604E8,
+    "percentChange24h": -0.06193,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "WETH",
+    "name": "WETH"
+  },
+  {
+    "currentPrice": 6.35,
+    "marketCap": 9.665277272E9,
+    "volume24h": 1.51826934E8,
+    "percentChange24h": 0.37578,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "DOT",
+    "name": "Polkadot"
+  },
+  {
+    "currentPrice": 125.02,
+    "marketCap": 9.435204253E9,
+    "volume24h": 1.380631439E9,
+    "percentChange24h": 7.11501,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "LTC",
+    "name": "Litecoin"
+  },
+  {
+    "currentPrice": 7.65,
+    "marketCap": 9.178296326E9,
+    "volume24h": 6.15247607E8,
+    "percentChange24h": 3.59161,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "BGB",
+    "name": "Bitget Token"
+  },
+  {
+    "currentPrice": 9.75,
+    "marketCap": 9.01246837E9,
+    "volume24h": 306609.0,
+    "percentChange24h": 0.1845,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "LEO",
+    "name": "LEO Token"
+  },
+  {
+    "currentPrice": 448.35,
+    "marketCap": 8.890178079E9,
+    "volume24h": 1.93197813E8,
+    "percentChange24h": 3.79038,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "BCH",
+    "name": "Bitcoin Cash"
+  },
+  {
+    "currentPrice": 23.65,
+    "marketCap": 7.820633947E9,
+    "volume24h": 3.0931033E7,
+    "percentChange24h": 0.258,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "HYPE",
+    "name": "Hyperliquid"
+  },
+  {
+    "currentPrice": 12.15,
+    "marketCap": 7.298678851E9,
+    "volume24h": 2.11005456E8,
+    "percentChange24h": -2.90385,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "UNI",
+    "name": "Uniswap"
+  },
+  {
+    "currentPrice": 1.001,
+    "marketCap": 6.724226557E9,
+    "volume24h": 3.0613068E7,
+    "percentChange24h": 0.08985,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "USDS",
+    "name": "USDS"
+  },
+  {
+    "currentPrice": 3529.58,
+    "marketCap": 6.633799232E9,
+    "volume24h": 7226790.0,
+    "percentChange24h": 0.11306,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "WEETH",
+    "name": "Wrapped eETH"
+  },
+  {
+    "currentPrice": 1.521E-5,
+    "marketCap": 6.398400066E9,
+    "volume24h": 6.95774864E8,
+    "percentChange24h": -0.36571,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "PEPE",
+    "name": "Pepe"
+  },
+  {
+    "currentPrice": 30.42,
+    "marketCap": 6.08262437E9,
+    "volume24h": 4.795596982E9,
+    "percentChange24h": -3.35896,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "TRUMP",
+    "name": "Official Trump"
+  },
+  {
+    "currentPrice": 4.95,
+    "marketCap": 5.818141845E9,
+    "volume24h": 1.7800017E8,
+    "percentChange24h": -0.8373,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "NEAR",
+    "name": "NEAR Protocol"
+  },
+  {
+    "currentPrice": 1.0,
+    "marketCap": 5.76567953E9,
+    "volume24h": 6.2002124E7,
+    "percentChange24h": 8.8E-4,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "USDE",
+    "name": "Ethena USDe"
+  },
+  {
+    "currentPrice": 327.65,
+    "marketCap": 4.931230761E9,
+    "volume24h": 3.88712768E8,
+    "percentChange24h": -4.0534,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "AAVE",
+    "name": "Aave"
+  },
+  {
+    "currentPrice": 8.13,
+    "marketCap": 4.652105471E9,
+    "volume24h": 1.64251111E8,
+    "percentChange24h": -1.79741,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "APT",
+    "name": "Aptos"
+  },
+  {
+    "currentPrice": 1.47,
+    "marketCap": 4.645886406E9,
+    "volume24h": 3.82152712E8,
+    "percentChange24h": 3.19205,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "ONDO",
+    "name": "Ondo"
+  },
+  {
+    "currentPrice": 9.19,
+    "marketCap": 4.409892441E9,
+    "volume24h": 1.70855599E8,
+    "percentChange24h": 1.32319,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "ICP",
+    "name": "Internet Computer"
+  },
+  {
+    "currentPrice": 27.2,
+    "marketCap": 4.093817171E9,
+    "volume24h": 1.28449094E8,
+    "percentChange24h": -0.88037,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "ETC",
+    "name": "Ethereum Classic"
+  },
+  {
+    "currentPrice": 28.37,
+    "marketCap": 4.088200092E9,
+    "volume24h": 1.1159339E7,
+    "percentChange24h": -0.31571,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "WBT",
+    "name": "WhiteBIT Coin"
+  },
+  {
+    "currentPrice": 220.35,
+    "marketCap": 4.064520617E9,
+    "volume24h": 4.8962445E7,
+    "percentChange24h": 0.77734,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "XMR",
+    "name": "Monero"
+  },
+  {
+    "currentPrice": 1.2,
+    "marketCap": 4.030619218E9,
+    "volume24h": 1.05676344E8,
+    "percentChange24h": 1.68529,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "MNT",
+    "name": "Mantle"
+  },
+  {
+    "currentPrice": 0.04791631,
+    "marketCap": 3.881175261E9,
+    "volume24h": 7.0383855E7,
+    "percentChange24h": -0.4746,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "VET",
+    "name": "VeChain"
+  },
+  {
+    "currentPrice": 0.137973,
+    "marketCap": 3.761057389E9,
+    "volume24h": 1.4637167E7,
+    "percentChange24h": -1.09078,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "CRO",
+    "name": "Cronos"
+  },
+  {
+    "currentPrice": 0.433552,
+    "marketCap": 3.672581336E9,
+    "volume24h": 9.2491444E7,
+    "percentChange24h": 0.00461,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "POL",
+    "name": "POL (ex-MATIC)"
+  },
+  {
+    "currentPrice": 3.8,
+    "marketCap": 3.662897129E9,
+    "volume24h": 1.4347995E8,
+    "percentChange24h": 7.92336,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "OM",
+    "name": "MANTRA"
+  },
+  {
+    "currentPrice": 6.96,
+    "marketCap": 3.594095631E9,
+    "volume24h": 9.1734143E7,
+    "percentChange24h": 0.68499,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "RENDER",
+    "name": "Render"
+  },
+  {
+    "currentPrice": 1.001,
+    "marketCap": 3.585618766E9,
+    "volume24h": 2.02528801E8,
+    "percentChange24h": 0.02172,
+    "lastUpdated": "2025-01-25T23:17:32.0823033",
+    "symbol": "DAI",
+    "name": "Dai"
+  },
+  {
+    "currentPrice": 0.133613,
+    "marketCap": 3.418850945E9,
+    "volume24h": 4.8731155E7,
+    "percentChange24h": 1.7047,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "KAS",
+    "name": "Kaspa"
+  },
+  {
+    "currentPrice": 0.406304,
+    "marketCap": 3.408289915E9,
+    "volume24h": 1.30290225E8,
+    "percentChange24h": 1.29273,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "ALGO",
+    "name": "Algorand"
+  },
+  {
+    "currentPrice": 55.1,
+    "marketCap": 3.306602698E9,
+    "volume24h": 1.3174324E7,
+    "percentChange24h": -0.90526,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "OKB",
+    "name": "OKB"
+  },
+  {
+    "currentPrice": 389.94,
+    "marketCap": 3.206255034E9,
+    "volume24h": 1.13287498E8,
+    "percentChange24h": 4.62246,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "TAO",
+    "name": "Bittensor"
+  },
+  {
+    "currentPrice": 1.21,
+    "marketCap": 3.141834632E9,
+    "volume24h": 1.64387394E8,
+    "percentChange24h": 0.03529,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FET",
+    "name": "Artificial Superintelligence Alliance"
+  },
+  {
+    "currentPrice": 24.86,
+    "marketCap": 3.128411898E9,
+    "volume24h": 6.0734212E7,
+    "percentChange24h": 1.65528,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "GT",
+    "name": "Gate"
+  },
+  {
+    "currentPrice": 5.01,
+    "marketCap": 3.121675959E9,
+    "volume24h": 1.51168321E8,
+    "percentChange24h": -0.3156,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FIL",
+    "name": "Filecoin"
+  },
+  {
+    "currentPrice": 0.705038,
+    "marketCap": 3.063080976E9,
+    "volume24h": 1.77356979E8,
+    "percentChange24h": 0.26307,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "ARB",
+    "name": "Arbitrum"
+  },
+  {
+    "currentPrice": 6.21,
+    "marketCap": 2.690544755E9,
+    "volume24h": 1.4451504E8,
+    "percentChange24h": -0.35439,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "ATOM",
+    "name": "Cosmos Hub"
+  },
+  {
+    "currentPrice": 0.856447,
+    "marketCap": 2.597479601E9,
+    "volume24h": 3.43666779E8,
+    "percentChange24h": -1.08566,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "ENA",
+    "name": "Ethena"
+  },
+  {
+    "currentPrice": 31.9,
+    "marketCap": 2.552338867E9,
+    "volume24h": 1.9919171E7,
+    "percentChange24h": 0.71961,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "TKX",
+    "name": "Tokenize Xchange"
+  },
+  {
+    "currentPrice": 2.52,
+    "marketCap": 2.506082043E9,
+    "volume24h": 2.31981725E8,
+    "percentChange24h": -1.32087,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "VIRTUAL",
+    "name": "Virtuals Protocol"
+  },
+  {
+    "currentPrice": 104995.0,
+    "marketCap": 2.43508022E9,
+    "volume24h": 2.34792174E8,
+    "percentChange24h": 0.0419,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "CBBTC",
+    "name": "Coinbase Wrapped BTC"
+  },
+  {
+    "currentPrice": 4.57,
+    "marketCap": 2.301664888E9,
+    "volume24h": 6.9413215E7,
+    "percentChange24h": -0.02763,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "TIA",
+    "name": "Celestia"
+  },
+  {
+    "currentPrice": 7.75,
+    "marketCap": 2.2539071E9,
+    "volume24h": 1.62693118E8,
+    "percentChange24h": -1.58006,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "RAY",
+    "name": "Raydium"
+  },
+  {
+    "currentPrice": 2.937E-5,
+    "marketCap": 2.248463672E9,
+    "volume24h": 1.86046988E8,
+    "percentChange24h": -2.89393,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "BONK",
+    "name": "Bonk"
+  },
+  {
+    "currentPrice": 1.64,
+    "marketCap": 2.223553335E9,
+    "volume24h": 1.5182785E8,
+    "percentChange24h": -5.60203,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "OP",
+    "name": "Optimism"
+  },
+  {
+    "currentPrice": 1.22,
+    "marketCap": 2.130839453E9,
+    "volume24h": 4.0264637E7,
+    "percentChange24h": 2.69218,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "IMX",
+    "name": "Immutable"
+  },
+  {
+    "currentPrice": 0.98867,
+    "marketCap": 2.127090016E9,
+    "volume24h": 8.93927628E8,
+    "percentChange24h": 16.12294,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "JUP",
+    "name": "Jupiter"
+  },
+  {
+    "currentPrice": 1.39,
+    "marketCap": 2.100393316E9,
+    "volume24h": 3.4253991E7,
+    "percentChange24h": 0.78607,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "STX",
+    "name": "Stacks"
+  },
+  {
+    "currentPrice": 20.83,
+    "marketCap": 2.039653584E9,
+    "volume24h": 8.488735E7,
+    "percentChange24h": -0.92552,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "INJ",
+    "name": "Injective"
+  },
+  {
+    "currentPrice": 3335.1,
+    "marketCap": 2.018130978E9,
+    "volume24h": 4.2910348E7,
+    "percentChange24h": -0.01598,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "WETH",
+    "name": "Binance-Peg WETH"
+  },
+  {
+    "currentPrice": 2.12,
+    "marketCap": 2.011505955E9,
+    "volume24h": 2.54203365E8,
+    "percentChange24h": -1.48518,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "WLD",
+    "name": "Worldcoin"
+  },
+  {
+    "currentPrice": 2.0,
+    "marketCap": 2.004309757E9,
+    "volume24h": 1.5592377E7,
+    "percentChange24h": 0.75356,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "THETA",
+    "name": "Theta Network"
+  },
+  {
+    "currentPrice": 265.48,
+    "marketCap": 1.997073468E9,
+    "volume24h": 1.3588976E7,
+    "percentChange24h": 0.08601,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "BNSOL",
+    "name": "Binance Staked SOL"
+  },
+  {
+    "currentPrice": 3451.73,
+    "marketCap": 1.875459083E9,
+    "volume24h": 3488859.0,
+    "percentChange24h": 0.2029,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "RSETH",
+    "name": "Kelp DAO Restaked ETH"
+  },
+  {
+    "currentPrice": 104678.0,
+    "marketCap": 1.869989953E9,
+    "volume24h": 1.0916168E7,
+    "percentChange24h": -0.13035,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "LBTC",
+    "name": "Lombard Staked BTC"
+  },
+  {
+    "currentPrice": 0.998255,
+    "marketCap": 1.833919715E9,
+    "volume24h": 3.062728579E9,
+    "percentChange24h": -0.03451,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FDUSD",
+    "name": "First Digital USD"
+  },
+  {
+    "currentPrice": 1.97,
+    "marketCap": 1.76274201E9,
+    "volume24h": 1.71907896E8,
+    "percentChange24h": -0.46473,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "LDO",
+    "name": "Lido DAO"
+  },
+  {
+    "currentPrice": 0.112038,
+    "marketCap": 1.756977073E9,
+    "volume24h": 5.6022943E7,
+    "percentChange24h": -0.82989,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "XDC",
+    "name": "XDC Network"
+  },
+  {
+    "currentPrice": 0.183338,
+    "marketCap": 1.751458253E9,
+    "volume24h": 7.4344929E7,
+    "percentChange24h": -0.68092,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "GRT",
+    "name": "The Graph"
+  },
+  {
+    "currentPrice": 0.540266,
+    "marketCap": 1.716923317E9,
+    "volume24h": 1.34507823E8,
+    "percentChange24h": -0.38276,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "S",
+    "name": "Sonic (prev. FTM)"
+  },
+  {
+    "currentPrice": 3732.27,
+    "marketCap": 1.704215455E9,
+    "volume24h": 5473669.0,
+    "percentChange24h": -0.19262,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "RETH",
+    "name": "Rocket Pool ETH"
+  },
+  {
+    "currentPrice": 3.9,
+    "marketCap": 1.671710398E9,
+    "volume24h": 5.1958137E7,
+    "percentChange24h": 0.05079,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FTN",
+    "name": "Fasttoken"
+  },
+  {
+    "currentPrice": 0.700908,
+    "marketCap": 1.614212467E9,
+    "volume24h": 1.06115516E8,
+    "percentChange24h": 7.80509,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "MOVE",
+    "name": "Movement"
+  },
+  {
+    "currentPrice": 13.02,
+    "marketCap": 1.596625016E9,
+    "volume24h": 163159.0,
+    "percentChange24h": -1.84719,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "KCS",
+    "name": "KuCoin"
+  },
+  {
+    "currentPrice": 108.93,
+    "marketCap": 1.583826657E9,
+    "volume24h": 3.6195429E7,
+    "percentChange24h": 0.99455,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "QNT",
+    "name": "Quant"
+  },
+  {
+    "currentPrice": 3511.9,
+    "marketCap": 1.556011634E9,
+    "volume24h": 1.5076867E7,
+    "percentChange24h": -0.22159,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "METH",
+    "name": "Mantle Staked Ether"
+  },
+  {
+    "currentPrice": 0.346137,
+    "marketCap": 1.53429129E9,
+    "volume24h": 9.2313574E7,
+    "percentChange24h": 0.3823,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "SEI",
+    "name": "Sei"
+  },
+  {
+    "currentPrice": 1.03,
+    "marketCap": 1.527423295E9,
+    "volume24h": 1031488.0,
+    "percentChange24h": 0.06261,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "SUSDS",
+    "name": "sUSDS"
+  },
+  {
+    "currentPrice": 0.02611913,
+    "marketCap": 1.491639193E9,
+    "volume24h": 9323271.0,
+    "percentChange24h": -1.66319,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FLR",
+    "name": "Flare"
+  },
+  {
+    "currentPrice": 1.43,
+    "marketCap": 1.438169372E9,
+    "volume24h": 2.37636363E8,
+    "percentChange24h": 11.68071,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FARTCOIN",
+    "name": "Fartcoin"
+  },
+  {
+    "currentPrice": 1.44,
+    "marketCap": 1.436369602E9,
+    "volume24h": 1.0343469E7,
+    "percentChange24h": 1.44724,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "NEXO",
+    "name": "NEXO"
+  },
+  {
+    "currentPrice": 0.02275081,
+    "marketCap": 1.429819469E9,
+    "volume24h": 1.63147824E8,
+    "percentChange24h": -2.95757,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "PENGU",
+    "name": "Pudgy Penguins"
+  },
+  {
+    "currentPrice": 324.57,
+    "marketCap": 1.387890712E9,
+    "volume24h": 1.01860069E8,
+    "percentChange24h": 0.17368,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "MSOL",
+    "name": "Marinade Staked SOL"
+  },
+  {
+    "currentPrice": 0.0323944,
+    "marketCap": 1.379355414E9,
+    "volume24h": 7.7322542E7,
+    "percentChange24h": -1.06678,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "GALA",
+    "name": "GALA"
+  },
+  {
+    "currentPrice": 104317.0,
+    "marketCap": 1.377683219E9,
+    "volume24h": 1.1005232E7,
+    "percentChange24h": -0.59403,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "SOLVBTC",
+    "name": "Solv Protocol SolvBTC"
+  },
+  {
+    "currentPrice": 0.557915,
+    "marketCap": 1.36439815E9,
+    "volume24h": 9.2642378E7,
+    "percentChange24h": 0.17701,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "SAND",
+    "name": "The Sandbox"
+  },
+  {
+    "currentPrice": 1.3754E-4,
+    "marketCap": 1.330506086E9,
+    "volume24h": 1.5031261E8,
+    "percentChange24h": -0.36261,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "FLOKI",
+    "name": "FLOKI"
+  },
+  {
+    "currentPrice": 0.02702095,
+    "marketCap": 1.307512518E9,
+    "volume24h": 1.00873535E8,
+    "percentChange24h": -0.81794,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "JASMY",
+    "name": "JasmyCoin"
+  },
+  {
+    "currentPrice": 1.29,
+    "marketCap": 1.284445185E9,
+    "volume24h": 3.62589578E8,
+    "percentChange24h": -5.94326,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "WIF",
+    "name": "dogwifhat"
+  },
+  {
+    "currentPrice": 0.99758,
+    "marketCap": 1.237259682E9,
+    "volume24h": 1.1978935E7,
+    "percentChange24h": -0.14115,
+    "lastUpdated": "2025-01-25T23:17:32.083302",
+    "symbol": "USD0",
+    "name": "Usual USD"
+  }
+]

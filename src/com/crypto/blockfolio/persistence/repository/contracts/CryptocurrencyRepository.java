@@ -16,4 +16,5 @@ public interface CryptocurrencyRepository extends Repository<Cryptocurrency, Str
     Set<Cryptocurrency> findAllByVolume24hGreaterThan(double volume24h);
 
     void updateCryptocurrency(Cryptocurrency cryptocurrency);
+    
 }

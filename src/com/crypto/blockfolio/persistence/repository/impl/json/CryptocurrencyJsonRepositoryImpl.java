@@ -4,6 +4,7 @@ import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
 import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,27 +50,12 @@ public final class CryptocurrencyJsonRepositoryImpl
             .collect(Collectors.toSet());
     }
 
-    /*
     @Override
-    public void updateCryptocurrency(Cryptocurrency cryptocurrency) {
-        if (cryptocurrency == null || !cryptocurrency.isValid()) {
-            throw new IllegalArgumentException("Некоректна криптовалюта для оновлення.");
-        }
-
-        // Знаходимо існуючу криптовалюту за символом
-        Optional<Cryptocurrency> existingCrypto = findBySymbol(cryptocurrency.getSymbol());
-
-        if (existingCrypto.isPresent()) {
-            entities.remove(existingCrypto.get());
-            entities.add(cryptocurrency);
-            saveChanges();
-            System.out.println("Криптовалюта " + cryptocurrency.getSymbol() + " успішно оновлена.");
-        } else {
-            throw new RuntimeException(
-                "Криптовалюта " + cryptocurrency.getSymbol() + " не знайдена.");
-        }
+    public Set<Cryptocurrency> findAll() {
+        return new LinkedHashSet<>(entities);
     }
-    */
+
+
     @Override
     public void updateCryptocurrency(Cryptocurrency cryptocurrency) {
         // Знаходимо криптовалюту, яку потрібно оновити
@@ -78,10 +64,8 @@ public final class CryptocurrencyJsonRepositoryImpl
         if (existingCrypto.isPresent()) {
             // Видаляємо стару версію
             entities.remove(existingCrypto.get());
-
             // Додаємо оновлену версію
             entities.add(cryptocurrency);
-
             // Зберігаємо зміни
             saveChanges();
         } else {

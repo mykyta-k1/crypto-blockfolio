@@ -36,5 +36,6 @@
     <orderEntry type="library" name="asciitable-0.3.2 (1)" level="project" />
     <orderEntry type="library" name="ascii-utf-themes-0.0.1" level="project" />
     <orderEntry type="library" name="char-translation-0.0.2" level="project" />
+    <orderEntry type="library" name="logback-classic-1.5.16" level="project" />
   </component>
 </module>

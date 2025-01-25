@@ -11,4 +11,6 @@ public interface AuthService {
     User getUser();
 
     void logout();
+
+    void updateUser(User user);
 }

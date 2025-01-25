@@ -8,4 +8,5 @@ public interface CoinGeckoApiService {
     Cryptocurrency getCryptocurrencyInfo(String name);
 
     List<Cryptocurrency> getAllCryptocurrencies();
+
 }

@@ -30,14 +30,17 @@ public final class ServiceFactory {
         var cryptocurrencyRepository = repositoryFactory.getCryptocurrencyRepository();
         var portfolioRepository = repositoryFactory.getPortfolioRepository();
         var transactionRepository = repositoryFactory.getTransactionRepository();
+        var authDataRepository = repositoryFactory.getAuthDataRepository();
 
-        this.authService = new AuthServiceImpl(userRepository);
+        this.authService = new AuthServiceImpl(userRepository, authDataRepository);
         this.userService = new UserServiceImpl(userRepository);
         this.signUpService = new SignUpServiceImpl(userService, authService);
-        this.portfolioService = new PortfolioServiceImpl(portfolioRepository);
+        this.portfolioService = new PortfolioServiceImpl(portfolioRepository,
+            cryptocurrencyRepository, transactionRepository);
         this.transactionService = new TransactionServiceImpl(transactionRepository,
             portfolioRepository);
-        this.coinGeckoApiService = new CoinGeckoApiServiceImpl();
+        this.coinGeckoApiService = new CoinGeckoApiServiceImpl(
+            cryptocurrencyRepository); // Ініціалізація з репозиторієм
         this.cryptocurrencyService = new CryptocurrencyServiceImpl(cryptocurrencyRepository,
             coinGeckoApiService);
     }

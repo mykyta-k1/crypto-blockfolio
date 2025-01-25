@@ -91,7 +91,7 @@ class GenericJsonRepository<E extends Identifiable<ID>, ID> implements Repositor
     protected void saveChanges() {
         try (FileWriter writer = new FileWriter(path.toFile())) {
             gson.toJson(entities, writer);
-            System.out.println("Дані збережено у файл: " + path.toAbsolutePath());
+            //System.out.println("Дані збережено у файл: " + path.toAbsolutePath());
         } catch (IOException e) {
             throw new JsonFileIOException(
                 "Не вдалося зберегти зміни у файл: %s".formatted(path.getFileName()), e);

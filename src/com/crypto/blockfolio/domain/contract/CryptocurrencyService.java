@@ -2,13 +2,14 @@ package com.crypto.blockfolio.domain.contract;
 
 import com.crypto.blockfolio.domain.Reportable;
 import com.crypto.blockfolio.domain.Service;
-import com.crypto.blockfolio.domain.dto.CryptocurrencyAddDto;
 import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
+import java.util.List;
 
 public interface CryptocurrencyService extends Service<Cryptocurrency, String>,
     Reportable<Cryptocurrency> {
 
-    void syncCryptocurrencyPrice(String name);
+    Cryptocurrency getCryptocurrencyInfo(String symbol);
 
-    Cryptocurrency addCryptocurrency(CryptocurrencyAddDto cryptocurrencyAddDto);
+    List<Cryptocurrency> getAllCryptocurrencies();
+
 }

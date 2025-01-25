@@ -27,6 +27,7 @@ public class JsonRepositoryFactory extends RepositoryFactory {
     private final CryptocurrencyJsonRepositoryImpl cryptocurrencyJsonRepositoryImpl;
     private final PortfolioJsonRepositoryImpl portfolioJsonRepositoryImpl;
     private final TransactionJsonRepositoryImpl transactionJsonRepositoryImpl;
+    private final AuthDataRepository authDataRepository;
 
     private JsonRepositoryFactory() {
         // Налаштування Gson
@@ -64,6 +65,7 @@ public class JsonRepositoryFactory extends RepositoryFactory {
         portfolioJsonRepositoryImpl = new PortfolioJsonRepositoryImpl(gson);
         transactionJsonRepositoryImpl = new TransactionJsonRepositoryImpl(gson);
         userJsonRepositoryImpl = new UserJsonRepositoryImpl(gson);
+        this.authDataRepository = new AuthDataRepository();
     }
 
     public static JsonRepositoryFactory getInstance() {
@@ -88,6 +90,11 @@ public class JsonRepositoryFactory extends RepositoryFactory {
     @Override
     public UserRepository getUserRepository() {
         return userJsonRepositoryImpl;
+    }
+
+    @Override
+    public AuthDataRepository getAuthDataRepository() {
+        return authDataRepository; // Provide AuthDataRepository
     }
 
     public void commit() {

@@ -5,7 +5,9 @@ import com.crypto.blockfolio.domain.dto.PortfolioAddDto;
 import com.crypto.blockfolio.domain.exception.EntityNotFoundException;
 import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
 import com.crypto.blockfolio.persistence.entity.Portfolio;
+import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
 import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
+import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -19,15 +21,24 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
     PortfolioService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PortfolioServiceImpl.class);
     private final PortfolioRepository portfolioRepository;
+    private final CryptocurrencyRepository cryptocurrencyRepository;
+    private final TransactionRepository transactionRepository;
 
-    public PortfolioServiceImpl(PortfolioRepository portfolioRepository) {
+    public PortfolioServiceImpl(PortfolioRepository portfolioRepository,
+        CryptocurrencyRepository cryptocurrencyRepository,
+        TransactionRepository transactionRepository) {
         super(portfolioRepository);
         this.portfolioRepository = portfolioRepository;
+        this.transactionRepository = transactionRepository;
+        this.cryptocurrencyRepository = cryptocurrencyRepository;
     }
 
     @Override
@@ -45,15 +56,15 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
     public boolean removeTransactionFromPortfolio(UUID portfolioId, UUID transactionId) {
         Portfolio portfolio = getPortfolioById(portfolioId);
         boolean removed = portfolio.removeTransaction(transactionId, transactionRepository,
-            portfolioRepository);
+            cryptocurrencyRepository);
 
         if (removed) {
-            portfolioRepository.update(
-                portfolio); // Зберігаємо оновлення портфеля після видалення транзакції
+            // Зберігаємо оновлений портфель у репозиторії
+            portfolioRepository.update(portfolio);
             return true;
         }
 
-        return false; // Повертаємо false, якщо транзакція не була знайдена або не видалена
+        return false; // Транзакція не знайдена або не видалена
     }
 
     @Override
@@ -86,7 +97,7 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
         portfolio.removeCryptocurrency(cryptocurrency);
         portfolioRepository.add(portfolio);
     }
-
+    /*
     @Override
     public void calculateTotalValue(UUID portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
@@ -109,6 +120,35 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
 
         portfolio.setTotalValue(totalValue); // Оновлюємо totalValue в портфелі
         portfolioRepository.update(portfolio); // Зберігаємо зміни
+    }
+    */
+
+    @Override
+    public void calculateTotalValue(UUID portfolioId) {
+        try {
+            Portfolio portfolio = getPortfolioById(portfolioId);
+
+            BigDecimal totalValue = portfolio.getBalances().entrySet().stream()
+                .map(entry -> {
+                    String symbol = entry.getKey();
+                    BigDecimal balance = entry.getValue();
+
+                    // Отримуємо криптовалюту через репозиторій
+                    Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(symbol)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                            "Криптовалюта з символом " + symbol + " не знайдена"));
+
+                    // Обчислюємо вартість
+                    return BigDecimal.valueOf(cryptocurrency.getCurrentPrice()).multiply(balance);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // Сума вартостей
+
+            portfolio.setTotalValue(totalValue);
+            portfolioRepository.update(portfolio); // Збереження оновленого портфеля
+            logger.info("Підрахунок загальної вартості для портфеля: {}", portfolioId);
+        } catch (Exception e) {
+            logger.error("Помилка підрахунку вартості для портфеля: {}", portfolioId, e);
+        }
     }
 
 

@@ -4,6 +4,7 @@ import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepo
 import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepository;
 import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import com.crypto.blockfolio.persistence.repository.contracts.UserRepository;
+import com.crypto.blockfolio.persistence.repository.impl.json.AuthDataRepository;
 import com.crypto.blockfolio.persistence.repository.impl.json.JsonRepositoryFactory;
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
@@ -32,6 +33,8 @@ public abstract class RepositoryFactory {
     public abstract PortfolioRepository getPortfolioRepository();
 
     public abstract TransactionRepository getTransactionRepository();
+
+    public abstract AuthDataRepository getAuthDataRepository();
 
     public abstract void commit();
 }

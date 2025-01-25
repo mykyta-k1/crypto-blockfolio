@@ -19,7 +19,7 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
     private final LocalDateTime createdAt;
     private final Map<String, BigDecimal> balances;
     private final Set<UUID> transactionsList; // Список транзакцій (за ID)
-    private BigDecimal totalValue;
+    private BigDecimal totalValue = BigDecimal.ZERO;
     private String name;
 
     public Portfolio(UUID id, UUID ownerId, String name) {
@@ -35,6 +35,7 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
             throw new EntityArgumentException(errors);
         }
     }
+
 
     /**
      * Додає криптовалюту до портфеля, якщо її ще немає в balances.
@@ -189,6 +190,7 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
 
         ValidationUtils.validateRequired(name, templateName, errors);
         ValidationUtils.validateLength(name, 1, 64, templateName, errors);
+        ValidationUtils.validatePattern(name, "^[а-яА-ЯёЁa-zA-Z0-9_\\s]+$", templateName, errors);
         this.name = name;
     }
 
