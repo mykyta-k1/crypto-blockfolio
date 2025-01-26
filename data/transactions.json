@@ -1,0 +1,36 @@
+[
+  {
+    "createdAt": "2025-01-26T00:59:09.2731089",
+    "cryptocurrency": {
+      "currentPrice": 105077.0,
+      "marketCap": 2.082130261079E12,
+      "volume24h": 2.2058292094E10,
+      "percentChange24h": 0.23752,
+      "lastUpdated": "2025-01-26T00:58:11.6489904",
+      "symbol": "BTC",
+      "name": "Bitcoin"
+    },
+    "transactionType": "SELL",
+    "amount": 1,
+    "costs": 1,
+    "fees": 0,
+    "id": "d79eae31-2cb8-4c1a-8a22-dcc94a660d36"
+  },
+  {
+    "createdAt": "2025-01-26T00:59:37.2152365",
+    "cryptocurrency": {
+      "currentPrice": 105077.0,
+      "marketCap": 2.082130261079E12,
+      "volume24h": 2.2058292094E10,
+      "percentChange24h": 0.23752,
+      "lastUpdated": "2025-01-26T00:58:11.6489904",
+      "symbol": "BTC",
+      "name": "Bitcoin"
+    },
+    "transactionType": "BUY",
+    "amount": 1,
+    "costs": 100,
+    "fees": 0,
+    "id": "42c1fdec-2335-43aa-9888-13459106592e"
+  }
+]

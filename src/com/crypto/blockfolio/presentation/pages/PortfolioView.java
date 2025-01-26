@@ -11,6 +11,7 @@ import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepo
 import com.crypto.blockfolio.presentation.ApplicationContext;
 import com.crypto.blockfolio.presentation.ViewService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class PortfolioView implements ViewService {
@@ -40,11 +42,10 @@ public class PortfolioView implements ViewService {
     }
 
     private void updateCryptocurrenciesFromApi() {
-        System.out.println("Оновлення даних криптовалют з API...");
         try {
             // Викликаємо метод для отримання всіх криптовалют
             List<Cryptocurrency> cryptocurrencies = cryptocurrencyService.getAllCryptocurrencies();
-            System.out.printf("Успішно оновлено %d криптовалют.%n", cryptocurrencies.size());
+            //System.out.printf("Успішно оновлено %d криптовалют.%n", cryptocurrencies.size());
         } catch (Exception e) {
             System.err.printf("Помилка оновлення криптовалют з API: %s%n", e.getMessage());
         }
@@ -54,11 +55,11 @@ public class PortfolioView implements ViewService {
     @Override
     public void display() {
         if (!authService.isAuthenticated()) {
-            System.out.println("Користувач не авторизований. Повернення до головного меню...");
+            //System.out.println("Користувач не авторизований. Повернення до головного меню...");
             return;
         }
         updateCryptocurrenciesFromApi();
-        System.out.println("Читання даних з файлу...");
+        //System.out.println("Читання даних з файлу...");
         List<Cryptocurrency> cryptocurrencies = readCryptocurrenciesFromFile();
 
         User currentUser = authService.getUser();
@@ -176,10 +177,84 @@ public class PortfolioView implements ViewService {
         }
     }
 
+    private void calculatePortfolioChange(Portfolio portfolio) {
+        AtomicReference<BigDecimal> totalValueChange24h = new AtomicReference<>(BigDecimal.ZERO);
+
+        portfolio.getBalances().forEach((symbol, balance) -> {
+            Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(symbol);
+
+            if (cryptoOpt.isPresent()) {
+                Cryptocurrency crypto = cryptoOpt.get();
+
+                // Отримання вартості монети
+                BigDecimal cryptoValue = BigDecimal.valueOf(crypto.getCurrentPrice())
+                    .multiply(balance);
+
+                // Розрахунок зміни за 24 години
+                BigDecimal cryptoChange24h = cryptoValue
+                    .multiply(BigDecimal.valueOf(crypto.getPercentChange24h()))
+                    .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+
+                // Додавання зміни до загальної зміни
+                totalValueChange24h.updateAndGet(v -> v.add(cryptoChange24h));
+            }
+        });
+
+        // Загальна зміна вартістю та у відсотках
+        BigDecimal totalPortfolioValue = portfolio.getTotalValue();
+        BigDecimal percentChange24h = totalValueChange24h.get()
+            .divide(totalPortfolioValue, RoundingMode.HALF_UP)
+            .multiply(BigDecimal.valueOf(100));
+
+        // Виведення результатів
+        System.out.printf(
+            "Зміна портфеля за 24 години: %.2f$ (%.2f%%)%n",
+            totalValueChange24h.get(),
+            percentChange24h
+        );
+    }
+
+
     private void viewPortfolioDetails(Portfolio portfolio) {
         while (true) {
+            // Розрахунок зміни портфеля за останні 24 години
+            AtomicReference<BigDecimal> totalValueChange24h = new AtomicReference<>(
+                BigDecimal.ZERO);
+
+            portfolio.getBalances().forEach((symbol, balance) -> {
+                Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(symbol);
+
+                if (cryptoOpt.isPresent()) {
+                    Cryptocurrency crypto = cryptoOpt.get();
+
+                    // Отримання вартості монети
+                    BigDecimal cryptoValue = BigDecimal.valueOf(crypto.getCurrentPrice())
+                        .multiply(balance);
+
+                    // Розрахунок зміни за 24 години
+                    BigDecimal cryptoChange24h = cryptoValue
+                        .multiply(BigDecimal.valueOf(crypto.getPercentChange24h()))
+                        .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+
+                    // Додавання зміни до загальної зміни
+                    totalValueChange24h.updateAndGet(v -> v.add(cryptoChange24h));
+                }
+            });
+
+            // Загальна зміна у відсотках
+            BigDecimal totalPortfolioValue = portfolio.getTotalValue();
+            BigDecimal percentChange24h = totalPortfolioValue.compareTo(BigDecimal.ZERO) > 0
+                ? totalValueChange24h.get()
+                .divide(totalPortfolioValue, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100))
+                : BigDecimal.ZERO;
+
+            // Виведення інформації про портфель
             System.out.printf("\n=== Портфель: %s ===\n", portfolio.getName());
-            System.out.printf("Вартість портфеля: %.2f$\n", portfolio.getTotalValue());
+            System.out.printf("Вартість портфеля: %.2f$\n", totalPortfolioValue);
+            System.out.printf("Зміна за 24 години: %.2f$ (%.2f%%)\n",
+                totalValueChange24h.get(),
+                percentChange24h);
             System.out.printf("Кількість монет у портфелі: %d\n", portfolio.getBalances().size());
 
             System.out.println("\nМонети в портфелі:");
@@ -187,13 +262,13 @@ public class PortfolioView implements ViewService {
                 System.out.println("У портфелі немає монет.");
             } else {
                 portfolio.getBalances().forEach((symbol, balance) -> {
-                    Optional<Cryptocurrency> cryptoOpt = cryptocurrencyRepository.findBySymbol(
-                        symbol);
+                    Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(symbol);
                     if (cryptoOpt.isPresent()) {
                         Cryptocurrency crypto = cryptoOpt.get();
                         System.out.printf(
-                            "Назва: %s | Символ: %s | Баланс: %.2f | Поточна ціна: %.2f | Загальна вартість: %.2f%n",
-                            crypto.getName(), symbol, balance, crypto.getCurrentPrice(),
+                            "Назва: %s | Символ: %s | Баланс: %.2f | Поточна ціна: %.2f | Вартість: %.2f%n",
+                            crypto.getName(), symbol.toUpperCase(), balance,
+                            crypto.getCurrentPrice(),
                             crypto.getCurrentPrice() * balance.doubleValue());
                     } else {
                         System.out.printf("Помилка: Дані про криптовалюту %s відсутні.%n", symbol);
@@ -201,65 +276,97 @@ public class PortfolioView implements ViewService {
                 });
             }
 
+            // Меню дій з портфелем
             System.out.println("\n[0] Повернутися назад");
+            System.out.println("[t] Створити транзакцію");
+            System.out.println("[h] Історія транзакцій");
             System.out.println("[+] Додати монету");
             System.out.println("[-] Видалити монету");
             System.out.print("Ваш вибір: ");
-            String input = scanner.nextLine().trim();
+            String input = scanner.nextLine().trim().toLowerCase();
 
-            if (input.equals("0")) {
-                break;
-            } else if (input.equals("+")) {
-                addCryptocurrencyToPortfolio(portfolio);
-            } else if (input.equals("-")) {
-                removeCryptocurrencyFromPortfolio(portfolio);
-            } else {
-                System.out.println("Невірний вибір. Спробуйте ще раз.");
+            switch (input) {
+                case "0" -> {
+                    return; // Повернення до попереднього меню
+                }
+                case "t" -> {
+                    TransactionsView transactionsView = new TransactionsView(portfolio.getId());
+                    transactionsView.display(); // Виклик сторінки транзакцій
+                }
+                case "h" -> {
+                    TransactionsView transactionsView = new TransactionsView(portfolio.getId());
+                    transactionsView.display(); // Перегляд історії транзакцій
+                }
+                case "+" -> addCryptocurrencyToPortfolio(portfolio);
+                case "-" -> removeCryptocurrencyFromPortfolio(portfolio);
+                default -> System.out.println("Невірний вибір. Спробуйте ще раз.");
             }
         }
     }
 
     private void addCryptocurrencyToPortfolio(Portfolio portfolio) {
-        System.out.print("Введіть символ криптовалюти: ");
-        String symbol = scanner.nextLine().trim();
+        System.out.print("Введіть символ або назву криптовалюти: ");
+        String input = scanner.nextLine().trim()
+            .toUpperCase(); // Перетворюємо символ у верхній регістр
 
-        System.out.print("Введіть кількість: ");
-        try {
-            BigDecimal amount = new BigDecimal(scanner.nextLine().trim());
-            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                System.out.println("Помилка: Кількість повинна бути більше нуля.");
+        Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(input);
+        if (cryptoOpt.isPresent()) {
+            Cryptocurrency crypto = cryptoOpt.get();
+            String normalizedSymbol = crypto.getSymbol().toUpperCase(); // Нормалізуємо символ
+
+            // Перевірка, чи криптовалюта вже є в портфелі
+            if (portfolio.getBalances().containsKey(normalizedSymbol)) {
+                System.out.println("Криптовалюта вже є у портфелі.");
                 return;
             }
 
-            Optional<Cryptocurrency> cryptoOpt = cryptocurrencyRepository.findBySymbol(symbol);
-            if (cryptoOpt.isPresent()) {
-                Cryptocurrency crypto = cryptoOpt.get();
-                portfolio.getBalances().put(symbol,
-                    portfolio.getBalances().getOrDefault(symbol, BigDecimal.ZERO).add(amount));
-                portfolioService.calculateTotalValue(portfolio.getId());
-                System.out.printf("Криптовалюта %s успішно додана до портфеля %s.%n",
-                    crypto.getName(),
-                    portfolio.getName());
-            } else {
-                System.out.printf("Помилка: Дані про криптовалюту %s відсутні.%n", symbol);
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Помилка: Некоректна кількість.");
+            // Додаємо криптовалюту з початковим балансом 0
+            portfolio.getBalances().put(normalizedSymbol, BigDecimal.ZERO);
+            portfolioService.calculateTotalValue(portfolio.getId());
+            System.out.printf(
+                "Криптовалюта %s успішно додана до портфеля %s",
+                crypto.getName(), portfolio.getName());
+        } else {
+            System.out.printf("Помилка: Дані про криптовалюту %s відсутні.%n", input);
         }
     }
 
-    private void removeCryptocurrencyFromPortfolio(Portfolio portfolio) {
-        System.out.print("Введіть символ криптовалюти для видалення: ");
-        String symbol = scanner.nextLine().trim();
+    private Optional<Cryptocurrency> findCryptocurrency(String input) {
+        // Перетворюємо введений текст у верхній регістр для пошуку
+        String normalizedInput = input.toUpperCase();
 
-        if (!portfolio.getBalances().containsKey(symbol)) {
+        // Спочатку шукаємо за символом
+        Optional<Cryptocurrency> cryptoOpt = cryptocurrencyRepository.findBySymbol(normalizedInput);
+        if (cryptoOpt.isPresent()) {
+            return cryptoOpt;
+        }
+
+        // Якщо не знайдено за символом, шукаємо за назвою
+        return cryptocurrencyRepository.findByName(input);
+    }
+
+
+    private void removeCryptocurrencyFromPortfolio(Portfolio portfolio) {
+        System.out.print("Введіть символ або назву криптовалюти для видалення: ");
+        String input = scanner.nextLine().trim().toUpperCase(); // Перетворюємо у верхній регістр
+
+        Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(input);
+        if (cryptoOpt.isEmpty()) {
+            System.out.printf("Помилка: Дані про криптовалюту %s відсутні.%n", input);
+            return;
+        }
+
+        Cryptocurrency crypto = cryptoOpt.get();
+        String normalizedSymbol = crypto.getSymbol().toUpperCase(); // Нормалізуємо символ
+        if (!portfolio.getBalances().containsKey(normalizedSymbol)) {
             System.out.println("Помилка: Криптовалюта відсутня у портфелі.");
             return;
         }
 
-        portfolio.getBalances().remove(symbol);
+        portfolio.getBalances().remove(normalizedSymbol);
         portfolioService.calculateTotalValue(portfolio.getId());
-        System.out.printf("Криптовалюта %s успішно видалена з портфеля %s.%n", symbol,
+        System.out.printf("Криптовалюта %s успішно видалена з портфеля %s.%n", crypto.getName(),
             portfolio.getName());
     }
+
 }

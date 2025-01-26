@@ -94,7 +94,7 @@ public class JsonRepositoryFactory extends RepositoryFactory {
 
     @Override
     public AuthDataRepository getAuthDataRepository() {
-        return authDataRepository; // Provide AuthDataRepository
+        return authDataRepository;
     }
 
     public void commit() {

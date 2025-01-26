@@ -37,11 +37,11 @@ class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
     public List<Cryptocurrency> getAllCryptocurrencies() {
         try {
             // Отримання даних з API
-            System.out.println("Отримання даних криптовалют з API...");
+            //System.out.println("Отримання даних криптовалют з API...");
             List<Cryptocurrency> cryptocurrencies = fetchAllCryptocurrenciesFromApi();
 
             // Збереження даних у репозиторій
-            System.out.println("Збереження даних у файл...");
+            //System.out.println("Збереження даних у файл...");
             cryptocurrencies.forEach(cryptocurrencyRepository::add);
 
             return cryptocurrencies;
@@ -74,7 +74,7 @@ class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
     }
 
     private JsonElement makeApiRequest(String endpoint) throws Exception {
-        System.out.printf("Запит до API: %s%n", endpoint);
+        //System.out.printf("Запит до API: %s%n", endpoint);
 
         URL url = new URL(endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

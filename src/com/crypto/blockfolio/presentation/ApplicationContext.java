@@ -5,6 +5,7 @@ import com.crypto.blockfolio.domain.contract.CoinGeckoApiService;
 import com.crypto.blockfolio.domain.contract.CryptocurrencyService;
 import com.crypto.blockfolio.domain.contract.PortfolioService;
 import com.crypto.blockfolio.domain.contract.SignUpService;
+import com.crypto.blockfolio.domain.contract.TransactionService;
 import com.crypto.blockfolio.domain.contract.UserService;
 import com.crypto.blockfolio.domain.impl.ServiceFactory;
 import com.crypto.blockfolio.persistence.repository.RepositoryFactory;
@@ -26,6 +27,7 @@ public class ApplicationContext {
     private static CryptocurrencyService cryptocurrencyService;
     private static PortfolioService portfolioService;
     private static CoinGeckoApiService coinGeckoApiService;
+    private static TransactionService transactionService;
     // Фабрики
     //private RepositoryFactory repositoryFactory;
     private ServiceFactory serviceFactory;
@@ -75,6 +77,10 @@ public class ApplicationContext {
         return coinGeckoApiService;
     }
 
+    public static TransactionService getTransactionService() {
+        return transactionService;
+    }
+
     private void initializeDependencies() throws NotImplementedException {
         // Ініціалізація фабрик
         //repositoryFactory = RepositoryFactory.getRepositoryFactory(RepositoryFactory.JSON);
@@ -93,6 +99,7 @@ public class ApplicationContext {
         cryptocurrencyService = serviceFactory.getCryptocurrencyService();
         signUpService = serviceFactory.getSignUpService();
         coinGeckoApiService = serviceFactory.getCoinGeckoApiService();
+        transactionService = serviceFactory.getTransactionService();
 
         System.out.println("Залежності успішно ініціалізовані.");
     }

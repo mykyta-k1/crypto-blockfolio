@@ -97,31 +97,6 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
         portfolio.removeCryptocurrency(cryptocurrency);
         portfolioRepository.add(portfolio);
     }
-    /*
-    @Override
-    public void calculateTotalValue(UUID portfolioId) {
-        Portfolio portfolio = portfolioRepository.findById(portfolioId)
-            .orElseThrow(() -> new EntityNotFoundException(
-                "Портфоліо з ID %s не знайдено.".formatted(portfolioId)));
-
-        // Обчислюємо загальну вартість портфеля через balances і PortfolioRepository
-        BigDecimal totalValue = portfolio.getBalances().entrySet().stream()
-            .map(entry -> {
-                String symbol = entry.getKey();
-                BigDecimal balance = entry.getValue();
-
-                // Отримуємо ціну криптовалюти через PortfolioRepository
-                return portfolioRepository.findCryptocurrencyBySymbol(symbol)
-                    .map(crypto -> BigDecimal.valueOf(crypto.getCurrentPrice()).multiply(balance))
-                    .orElse(
-                        BigDecimal.ZERO); // Якщо криптовалюта не знайдена, вважаємо її вартість 0
-            })
-            .reduce(BigDecimal.ZERO, BigDecimal::add); // Підсумовуємо всі вартості
-
-        portfolio.setTotalValue(totalValue); // Оновлюємо totalValue в портфелі
-        portfolioRepository.update(portfolio); // Зберігаємо зміни
-    }
-    */
 
     @Override
     public void calculateTotalValue(UUID portfolioId) {
@@ -145,7 +120,7 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
 
             portfolio.setTotalValue(totalValue);
             portfolioRepository.update(portfolio); // Збереження оновленого портфеля
-            logger.info("Підрахунок загальної вартості для портфеля: {}", portfolioId);
+            //logger.info("Підрахунок загальної вартості для портфеля: {}", portfolioId);
         } catch (Exception e) {
             logger.error("Помилка підрахунку вартості для портфеля: {}", portfolioId, e);
         }
