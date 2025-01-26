@@ -1,9 +1,11 @@
 package com.crypto.blockfolio.domain.impl;
 
 import com.crypto.blockfolio.domain.contract.TransactionService;
+import com.crypto.blockfolio.domain.dto.CryptocurrencyAddDto;
 import com.crypto.blockfolio.domain.dto.TransactionAddDto;
 import com.crypto.blockfolio.domain.exception.EntityNotFoundException;
 import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
+import com.crypto.blockfolio.persistence.entity.Portfolio;
 import com.crypto.blockfolio.persistence.entity.Transaction;
 import com.crypto.blockfolio.persistence.entity.TransactionType;
 import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
@@ -29,12 +31,16 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
 
     private final TransactionRepository transactionRepository;
     private final PortfolioRepository portfolioRepository;
+    private final CryptocurrencyRepository cryptocurrencyRepository;
+
 
     public TransactionServiceImpl(TransactionRepository transactionRepository,
-        PortfolioRepository portfolioRepository) {
+        PortfolioRepository portfolioRepository,
+        CryptocurrencyRepository cryptocurrencyRepository) {
         super(transactionRepository);
         this.transactionRepository = transactionRepository;
         this.portfolioRepository = portfolioRepository;
+        this.cryptocurrencyRepository = cryptocurrencyRepository;
     }
 
     @Override
@@ -47,6 +53,7 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
 
         Transaction transaction = new Transaction(
             transactionAddDto.getId(),
+            transactionAddDto.getPortfolioId(),
             cryptocurrency,
             transactionAddDto.getTransactionType(),
             transactionAddDto.getAmount(),
@@ -142,6 +149,151 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
         } catch (IOException e) {
             throw new RuntimeException("Помилка при створенні звіту: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void updateCryptocurrency(String symbol, CryptocurrencyAddDto updatedCryptocurrencyDto) {
+        Cryptocurrency existingCryptocurrency = cryptocurrencyRepository.findBySymbol(symbol)
+            .orElseThrow(
+                () -> new EntityNotFoundException("Криптовалюта з таким символом не знайдена."));
+
+        existingCryptocurrency.setCurrentPrice(updatedCryptocurrencyDto.getCurrentPrice());
+        existingCryptocurrency.setMarketCap(updatedCryptocurrencyDto.getMarketCap());
+        existingCryptocurrency.setVolume24h(updatedCryptocurrencyDto.getVolume24h());
+        existingCryptocurrency.setPercentChange24h(updatedCryptocurrencyDto.getPercentChange24h());
+        existingCryptocurrency.setLastUpdated(updatedCryptocurrencyDto.getLastUpdated());
+
+        cryptocurrencyRepository.add(
+            existingCryptocurrency); // Використовуємо `add`, щоб оновити дані
+    }
+
+    /*
+    @Override
+    public void updateTransaction(UUID transactionId, TransactionAddDto updatedTransactionDto) {
+        // Отримання існуючої транзакції
+        Transaction existingTransaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new EntityNotFoundException("Транзакція не знайдена."));
+
+        // Оновлення полів транзакції
+        Cryptocurrency cryptocurrency = cryptocurrencyRepository
+            .findBySymbol(updatedTransactionDto.getCryptocurrencySymbol())
+            .orElseThrow(() -> new EntityNotFoundException("Криптовалюта не знайдена."));
+
+        existingTransaction.setCryptocurrency(cryptocurrency);
+        existingTransaction.setTransactionType(updatedTransactionDto.getTransactionType());
+        existingTransaction.setAmount(updatedTransactionDto.getAmount());
+        existingTransaction.setCosts(updatedTransactionDto.getCosts());
+        existingTransaction.setFees(updatedTransactionDto.getFees());
+        existingTransaction.setDescription(updatedTransactionDto.getDescription());
+
+        // Збереження змін
+        transactionRepository.updateTransaction(transactionId, existingTransaction);
+    }
+    */
+    @Override
+    public void updateTransaction(UUID transactionId, TransactionAddDto updatedTransactionDto) {
+        // Отримання існуючої транзакції
+        Transaction existingTransaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new EntityNotFoundException("Транзакція не знайдена."));
+
+        // Отримання портфеля
+        Portfolio portfolio = portfolioRepository.findById(existingTransaction.getPortfolioId())
+            .orElseThrow(() -> new EntityNotFoundException("Портфоліо не знайдено."));
+
+        // Видалення впливу існуючої транзакції
+        updatePortfolioBalance(portfolio, existingTransaction, true);
+        
+        if (updatedTransactionDto.getTransactionType() == TransactionType.SELL) {
+            BigDecimal currentBalance = portfolio.getBalances()
+                .getOrDefault(updatedTransactionDto.getCryptocurrencySymbol(), BigDecimal.ZERO);
+
+            if (currentBalance.compareTo(updatedTransactionDto.getAmount()) < 0) {
+                throw new IllegalArgumentException("Недостатньо балансу для продажу.");
+            }
+        }
+        // Оновлення полів транзакції
+        Cryptocurrency cryptocurrency = cryptocurrencyRepository
+            .findBySymbol(updatedTransactionDto.getCryptocurrencySymbol())
+            .orElseThrow(() -> new EntityNotFoundException("Криптовалюта не знайдена."));
+
+        existingTransaction.setCryptocurrency(cryptocurrency);
+        existingTransaction.setTransactionType(updatedTransactionDto.getTransactionType());
+        existingTransaction.setAmount(updatedTransactionDto.getAmount());
+        existingTransaction.setCosts(updatedTransactionDto.getCosts());
+        existingTransaction.setFees(updatedTransactionDto.getFees());
+        existingTransaction.setDescription(updatedTransactionDto.getDescription());
+
+        // Збереження змін у транзакції
+        transactionRepository.updateTransaction(transactionId, existingTransaction);
+
+        // Додавання впливу оновленої транзакції
+        updatePortfolioBalance(portfolio, existingTransaction, false);
+
+        // Збереження оновленого портфеля
+        portfolioRepository.update(portfolio);
+    }
+
+    private void updatePortfolioBalance(Portfolio portfolio, Transaction transaction,
+        boolean reverse) {
+        BigDecimal amount = transaction.getAmount();
+        if (reverse) {
+            amount = amount.negate(); // Зворотня операція для відміни
+        }
+
+        // Оновлення балансу відповідної криптовалюти
+        BigDecimal currentBalance = portfolio.getBalances()
+            .getOrDefault(transaction.getCryptocurrency().getSymbol(), BigDecimal.ZERO);
+
+        if (transaction.getTransactionType() == TransactionType.BUY ||
+            transaction.getTransactionType() == TransactionType.TRANSFER_DEPOSIT) {
+            if (!reverse && currentBalance.compareTo(amount) < 0) {
+                throw new IllegalArgumentException(
+                    "Недостатньо балансу для виконання операції з символом "
+                        + transaction.getCryptocurrency().getSymbol());
+            }
+            portfolio.getBalances()
+                .put(transaction.getCryptocurrency().getSymbol(), currentBalance.add(amount));
+        } else {
+            portfolio.getBalances()
+                .put(transaction.getCryptocurrency().getSymbol(), currentBalance.subtract(amount));
+        }
+        portfolioRepository.calculateTotalValue(portfolio.getId());
+        // Перерахунок загальної вартості портфеля
+        //calculateTotalValue(portfolio.getId());
+    }
+
+
+    @Override
+    public Transaction addTransaction(TransactionAddDto transactionAddDto) {
+        Cryptocurrency cryptocurrency = cryptocurrencyRepository
+            .findBySymbol(transactionAddDto.getCryptocurrencySymbol())
+            .orElseThrow(
+                () -> new EntityNotFoundException("Криптовалюта з таким символом не знайдена."));
+
+        Transaction transaction = new Transaction(
+            transactionAddDto.getId(),
+            transactionAddDto.getPortfolioId(),
+            cryptocurrency,
+            transactionAddDto.getTransactionType(),
+            transactionAddDto.getAmount(),
+            transactionAddDto.getCosts(),
+            null,
+            transactionAddDto.getFees(),
+            transactionAddDto.getDescription(),
+            LocalDateTime.now()
+        );
+        System.out.println("Додано транзакцію до репозиторію: " + transaction.getId());
+        // Зберігаємо транзакцію
+        transactionRepository.add(transaction);
+
+        // Оновлюємо портфель
+        Portfolio portfolio = portfolioRepository.findById(transactionAddDto.getPortfolioId())
+            .orElseThrow(() -> new EntityNotFoundException("Портфоліо з таким ID не знайдено."));
+        portfolio.getTransactionsList().add(transaction.getId());
+        portfolioRepository.update(portfolio);
+        System.out.println(
+            "Оновлено список транзакцій у портфелі: " + portfolio.getTransactionsList());
+        return transaction;
     }
 
 }

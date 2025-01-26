@@ -59,4 +59,18 @@ public final class TransactionJsonRepositoryImpl
         remove(transaction);
         saveChanges();
     }
+
+    @Override
+    public void updateTransaction(UUID transactionId, Transaction updatedTransaction) {
+        Transaction existingTransaction = findById(transactionId)
+            .orElseThrow(() -> new IllegalArgumentException("Транзакція не знайдена."));
+        existingTransaction.setAmount(updatedTransaction.getAmount());
+        existingTransaction.setCosts(updatedTransaction.getCosts());
+        existingTransaction.setFees(updatedTransaction.getFees());
+        existingTransaction.setTransactionType(updatedTransaction.getTransactionType());
+        existingTransaction.setDescription(updatedTransaction.getDescription());
+        saveChanges();
+    }
+
+
 }

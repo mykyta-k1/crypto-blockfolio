@@ -2,6 +2,7 @@ package com.crypto.blockfolio.domain.impl;
 
 import com.crypto.blockfolio.domain.contract.CoinGeckoApiService;
 import com.crypto.blockfolio.domain.contract.CryptocurrencyService;
+import com.crypto.blockfolio.domain.dto.CryptocurrencyAddDto;
 import com.crypto.blockfolio.persistence.entity.Cryptocurrency;
 import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
 import java.util.List;
@@ -49,6 +50,23 @@ class CryptocurrencyServiceImpl extends GenericService<Cryptocurrency, String> i
             // If API fails, fall back to data from the repository
             return List.copyOf(cryptocurrencyRepository.findAll());
         }
+    }
+
+    @Override
+    public void addCryptocurrency(CryptocurrencyAddDto cryptocurrencyDto) {
+        // Створюємо об'єкт Cryptocurrency на основі DTO
+        Cryptocurrency cryptocurrency = new Cryptocurrency(
+            cryptocurrencyDto.getSymbol(),
+            cryptocurrencyDto.getName(),
+            cryptocurrencyDto.getCurrentPrice(),
+            cryptocurrencyDto.getMarketCap(),
+            cryptocurrencyDto.getVolume24h(),
+            cryptocurrencyDto.getPercentChange24h(),
+            cryptocurrencyDto.getLastUpdated()
+        );
+
+        // Використовуємо репозиторій для збереження даних
+        cryptocurrencyRepository.add(cryptocurrency);
     }
 
 

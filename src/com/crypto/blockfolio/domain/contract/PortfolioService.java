@@ -22,7 +22,9 @@ public interface PortfolioService extends Service<Portfolio, UUID>, Reportable<P
 
     void removeCryptocurrencyFromPortfolio(UUID portfolioId, Cryptocurrency cryptocurrency);
 
-    void calculateTotalValue(UUID portfolioId);
+    //void calculateTotalValue(UUID portfolioId);
+
+    void calculateTotalValue(Portfolio portfolio);
 
     boolean removeTransactionFromPortfolio(UUID portfolioId, UUID transactionId);
 }

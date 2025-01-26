@@ -1,36 +1,38 @@
 [
   {
-    "createdAt": "2025-01-26T00:59:09.2731089",
+    "portfolioId": "9876a687-679c-4172-a19d-9ee7ddf1072a",
+    "createdAt": "2025-01-26T19:16:09.5427953",
     "cryptocurrency": {
-      "currentPrice": 105077.0,
-      "marketCap": 2.082130261079E12,
-      "volume24h": 2.2058292094E10,
-      "percentChange24h": 0.23752,
-      "lastUpdated": "2025-01-26T00:58:11.6489904",
-      "symbol": "BTC",
-      "name": "Bitcoin"
+      "currentPrice": 1.23,
+      "marketCap": 2.145619739E9,
+      "volume24h": 3.3440646E7,
+      "percentChange24h": 0.7254,
+      "lastUpdated": "2025-01-26T19:13:59.4626544",
+      "symbol": "IMX",
+      "name": "Immutable"
     },
     "transactionType": "SELL",
-    "amount": 1,
-    "costs": 1,
+    "amount": 100,
+    "costs": 0,
     "fees": 0,
-    "id": "d79eae31-2cb8-4c1a-8a22-dcc94a660d36"
+    "id": "6b10310a-af7f-4aee-bb4c-53fda78832b9"
   },
   {
-    "createdAt": "2025-01-26T00:59:37.2152365",
+    "portfolioId": "9876a687-679c-4172-a19d-9ee7ddf1072a",
+    "createdAt": "2025-01-26T19:14:40.0097298",
     "cryptocurrency": {
-      "currentPrice": 105077.0,
-      "marketCap": 2.082130261079E12,
-      "volume24h": 2.2058292094E10,
-      "percentChange24h": 0.23752,
-      "lastUpdated": "2025-01-26T00:58:11.6489904",
-      "symbol": "BTC",
-      "name": "Bitcoin"
+      "currentPrice": 1.23,
+      "marketCap": 2.145619739E9,
+      "volume24h": 3.3440646E7,
+      "percentChange24h": 0.7254,
+      "lastUpdated": "2025-01-26T19:13:59.4626544",
+      "symbol": "IMX",
+      "name": "Immutable"
     },
     "transactionType": "BUY",
-    "amount": 1,
-    "costs": 100,
+    "amount": 430,
+    "costs": 0,
     "fees": 0,
-    "id": "42c1fdec-2335-43aa-9888-13459106592e"
+    "id": "7952e674-8c13-4c5d-9834-c7093927801e"
   }
 ]

@@ -2,6 +2,7 @@ package com.crypto.blockfolio.domain.contract;
 
 import com.crypto.blockfolio.domain.Reportable;
 import com.crypto.blockfolio.domain.Service;
+import com.crypto.blockfolio.domain.dto.CryptocurrencyAddDto;
 import com.crypto.blockfolio.domain.dto.TransactionAddDto;
 import com.crypto.blockfolio.persistence.entity.Transaction;
 import com.crypto.blockfolio.persistence.repository.contracts.CryptocurrencyRepository;
@@ -20,4 +21,10 @@ public interface TransactionService extends Service<Transaction, UUID>, Reportab
     void deleteTransaction(UUID id);
 
     void calculatePnL(UUID transactionId);
+
+    void updateCryptocurrency(String symbol, CryptocurrencyAddDto updatedCryptocurrencyDto);
+
+    void updateTransaction(UUID transactionId, TransactionAddDto updatedTransactionDto);
+
+    Transaction addTransaction(TransactionAddDto transactionAddDto);
 }

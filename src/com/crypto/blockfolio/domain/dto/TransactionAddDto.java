@@ -4,19 +4,23 @@ import com.crypto.blockfolio.persistence.Entity;
 import com.crypto.blockfolio.persistence.entity.ErrorTemplates;
 import com.crypto.blockfolio.persistence.entity.TransactionType;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public final class TransactionAddDto extends Entity {
 
     private final String cryptocurrencySymbol;
+    private final UUID portfolioId;
     private final TransactionType transactionType;
     private final BigDecimal amount;
     private final BigDecimal costs;
     private final BigDecimal fees;
     private final String description;
+    private final LocalDateTime createdAt;
 
     public TransactionAddDto(
         UUID id,
+        UUID portfolioId,
         String cryptocurrencySymbol,
         TransactionType transactionType,
         BigDecimal amount,
@@ -25,16 +29,26 @@ public final class TransactionAddDto extends Entity {
         String description
     ) {
         super(id);
+        this.portfolioId = portfolioId;
         this.cryptocurrencySymbol = validateCryptocurrencySymbol(cryptocurrencySymbol);
         this.transactionType = validateTransactionType(transactionType);
         this.amount = validateAmount(amount);
         this.costs = validateCosts(costs);
         this.fees = validateFees(fees);
         this.description = validateDescription(description);
+        this.createdAt = LocalDateTime.now();
 
         if (!errors.isEmpty()) {
             throw new IllegalArgumentException("Некоректні дані транзакції: " + errors);
         }
+    }
+
+    public UUID getPortfolioId() {
+        return portfolioId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     private String validateCryptocurrencySymbol(String symbol) {
@@ -59,10 +73,10 @@ public final class TransactionAddDto extends Entity {
     }
 
     private BigDecimal validateCosts(BigDecimal costs) {
-        if (costs == null || costs.compareTo(BigDecimal.ZERO) <= 0) {
-            errors.add("Витрати повинні бути більше 0.");
+        if (costs == null || costs.compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Витрати не можуть бути від’ємними.");
         }
-        return costs;
+        return costs != null ? costs : BigDecimal.ZERO;
     }
 
     private BigDecimal validateFees(BigDecimal fees) {

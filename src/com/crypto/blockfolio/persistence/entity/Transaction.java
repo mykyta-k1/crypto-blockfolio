@@ -20,7 +20,8 @@ public class Transaction extends Entity implements Comparable<Transaction> {
     private BigDecimal fees;
     private String description;
 
-    public Transaction(UUID id, Cryptocurrency cryptocurrency, TransactionType transactionType,
+    public Transaction(UUID id, UUID portfolioId, Cryptocurrency cryptocurrency,
+        TransactionType transactionType,
         BigDecimal amount, BigDecimal costs, BigDecimal profit, BigDecimal fees, String description,
         LocalDateTime createdAt) {
         super(id);
@@ -28,6 +29,7 @@ public class Transaction extends Entity implements Comparable<Transaction> {
         setTransactionType(transactionType);
         setAmount(amount);
         setCosts(costs);
+        this.portfolioId = portfolioId;
         this.profit = profit;
         this.fees = fees;
         this.description = description;

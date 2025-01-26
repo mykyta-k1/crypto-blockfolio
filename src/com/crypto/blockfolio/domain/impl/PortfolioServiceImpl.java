@@ -67,11 +67,11 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
         return false; // Транзакція не знайдена або не видалена
     }
 
-    @Override
     public Portfolio getPortfolioById(UUID id) {
         return portfolioRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Портфель із таким ID не знайдено."));
     }
+
 
     @Override
     public List<Portfolio> getAllPortfolios() {
@@ -99,6 +99,32 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
     }
 
     @Override
+    public void calculateTotalValue(Portfolio portfolio) {
+        try {
+            BigDecimal totalValue = portfolio.getBalances().entrySet().stream()
+                .map(entry -> {
+                    String symbol = entry.getKey();
+                    BigDecimal balance = entry.getValue();
+
+                    // Отримуємо криптовалюту через репозиторій
+                    Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(symbol)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                            "Криптовалюта з символом " + symbol + " не знайдена"));
+
+                    // Обчислюємо вартість
+                    return BigDecimal.valueOf(cryptocurrency.getCurrentPrice()).multiply(balance);
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // Сума вартостей
+
+            portfolio.setTotalValue(totalValue);
+            portfolioRepository.update(portfolio); // Збереження оновленого портфеля
+        } catch (Exception e) {
+            logger.error("Помилка підрахунку вартості для портфеля: {}", portfolio.getId(), e);
+        }
+    }
+
+    /*
+    @Override
     public void calculateTotalValue(UUID portfolioId) {
         try {
             Portfolio portfolio = getPortfolioById(portfolioId);
@@ -125,7 +151,7 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
             logger.error("Помилка підрахунку вартості для портфеля: {}", portfolioId, e);
         }
     }
-
+    */
 
     @Override
     public void generateReport(Predicate<Portfolio> filter) {

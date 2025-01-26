@@ -38,7 +38,7 @@ public final class ServiceFactory {
         this.portfolioService = new PortfolioServiceImpl(portfolioRepository,
             cryptocurrencyRepository, transactionRepository);
         this.transactionService = new TransactionServiceImpl(transactionRepository,
-            portfolioRepository);
+            portfolioRepository, cryptocurrencyRepository);
         this.coinGeckoApiService = new CoinGeckoApiServiceImpl(
             cryptocurrencyRepository); // Ініціалізація з репозиторієм
         this.cryptocurrencyService = new CryptocurrencyServiceImpl(cryptocurrencyRepository,

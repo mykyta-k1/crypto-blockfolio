@@ -1,52 +1,17 @@
 [
   {
     "ownerId": "fad9f9c3-1df6-4547-b40d-7084029b6c47",
-    "createdAt": "2025-01-25T19:14:39.9505473",
-    "balances": {},
-    "transactionsList": [],
-    "totalValue": 0,
-    "name": "Порт",
-    "id": "a891648b-a2ca-493f-8e20-e39e076fddbd"
-  },
-  {
-    "ownerId": "fad9f9c3-1df6-4547-b40d-7084029b6c47",
-    "createdAt": "2025-01-25T19:14:56.5560189",
-    "balances": {},
-    "transactionsList": [],
-    "totalValue": 0,
-    "name": "3",
-    "id": "3595bb19-5226-44dc-9049-475a35a86069"
-  },
-  {
-    "ownerId": "fad9f9c3-1df6-4547-b40d-7084029b6c47",
-    "createdAt": "2025-01-25T19:14:28.5244578",
-    "balances": {},
-    "transactionsList": [],
-    "totalValue": 0,
-    "name": "2",
-    "id": "88f2ad73-39dc-439c-a608-d111290f99fc"
-  },
-  {
-    "ownerId": "fad9f9c3-1df6-4547-b40d-7084029b6c47",
-    "createdAt": "2025-01-25T19:17:35.8072331",
+    "createdAt": "2025-01-26T19:14:08.3062731",
     "balances": {
-      "imx": 110,
-      "Imx": 1000
+      "BTC": 0,
+      "IMX": 330
     },
-    "transactionsList": [],
-    "totalValue": 1354.20,
+    "transactionsList": [
+      "7952e674-8c13-4c5d-9834-c7093927801e",
+      "6b10310a-af7f-4aee-bb4c-53fda78832b9"
+    ],
+    "totalValue": 405.90,
     "name": "New Portfolio",
-    "id": "1213e099-2bd1-4cdb-87aa-a0f36fbcfc5e"
-  },
-  {
-    "ownerId": "fad9f9c3-1df6-4547-b40d-7084029b6c47",
-    "createdAt": "2025-01-25T23:34:52.2013424",
-    "balances": {
-      "BTC": 0.5
-    },
-    "transactionsList": [],
-    "totalValue": 52441.00,
-    "name": "Portfolio 2025",
-    "id": "620784f3-1fb7-4b4f-96a4-935ca0ae09c5"
+    "id": "9876a687-679c-4172-a19d-9ee7ddf1072a"
   }
 ]

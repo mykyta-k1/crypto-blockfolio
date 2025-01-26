@@ -36,7 +36,6 @@ public class Portfolio extends Entity implements Comparable<Portfolio> {
         }
     }
 
-
     /**
      * Додає криптовалюту до портфеля, якщо її ще немає в balances.
      */

@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -55,21 +57,24 @@ public class PortfolioView implements ViewService {
     @Override
     public void display() {
         if (!authService.isAuthenticated()) {
-            //System.out.println("Користувач не авторизований. Повернення до головного меню...");
+            System.out.println("Користувач не авторизований. Повернення до головного меню...");
             return;
         }
-        updateCryptocurrenciesFromApi();
-        //System.out.println("Читання даних з файлу...");
-        List<Cryptocurrency> cryptocurrencies = readCryptocurrenciesFromFile();
+        // Завантаження криптовалют асинхронно
+        CompletableFuture<Void> asyncUpdate = CompletableFuture.runAsync(
+            this::updateCryptocurrenciesFromApi);
+        // Показуємо меню одразу, без очікування завершення запиту
+        showMenu(asyncUpdate);
+    }
 
-        User currentUser = authService.getUser();
-
+    private void showMenu(CompletableFuture<Void> asyncUpdate) {
         while (true) {
-            List<Portfolio> portfolios = loadUserPortfolios(currentUser);
-
             System.out.println("\n=== Портфелі користувача ===");
             System.out.println("[0] Повернутися назад");
             System.out.println("[+] Створити новий портфель");
+
+            User currentUser = authService.getUser();
+            List<Portfolio> portfolios = loadUserPortfolios(currentUser);
 
             if (portfolios.isEmpty()) {
                 System.out.println("У вас немає створених портфелів.");
@@ -101,6 +106,11 @@ public class PortfolioView implements ViewService {
                     System.out.println("Помилка: Введіть номер або '+'.");
                 }
             }
+
+            // Перевірка завершення асинхронного завантаження
+            if (asyncUpdate.isDone()) {
+                System.out.println("Дані криптовалют оновлено.");
+            }
         }
     }
 
@@ -109,10 +119,13 @@ public class PortfolioView implements ViewService {
     }
 
     private List<Portfolio> loadUserPortfolios(User user) {
-        return user.getPortfolios().stream()
+        List<UUID> validPortfolioIds = new ArrayList<>();
+        List<Portfolio> portfolios = user.getPortfolios().stream()
             .map(portfolioId -> {
                 try {
-                    return portfolioService.getPortfolioById(portfolioId);
+                    Portfolio portfolio = portfolioService.getPortfolioById(portfolioId);
+                    validPortfolioIds.add(portfolioId);
+                    return portfolio;
                 } catch (Exception e) {
                     System.out.printf("Помилка завантаження портфеля з ID %s: %s%n", portfolioId,
                         e.getMessage());
@@ -122,7 +135,7 @@ public class PortfolioView implements ViewService {
             .filter(Objects::nonNull)
             .peek(portfolio -> {
                 try {
-                    portfolioService.calculateTotalValue(portfolio.getId());
+                    portfolioService.calculateTotalValue(portfolio);
                 } catch (Exception e) {
                     System.out.printf("Помилка підрахунку вартості портфеля %s: %s%n",
                         portfolio.getName(), e.getMessage());
@@ -131,7 +144,14 @@ public class PortfolioView implements ViewService {
             .sorted(Comparator.comparing(p -> p.getTotalValue().doubleValue(),
                 Comparator.reverseOrder()))
             .collect(Collectors.toList());
+
+        // Оновлюємо список портфелів користувача
+        user.setPortfolios(new HashSet<>(validPortfolioIds));
+        authService.updateUser(user);
+
+        return portfolios;
     }
+
 
     private void createPortfolio(User currentUser) {
         System.out.print("Введіть назву нового портфеля: ");
@@ -257,23 +277,41 @@ public class PortfolioView implements ViewService {
                 percentChange24h);
             System.out.printf("Кількість монет у портфелі: %d\n", portfolio.getBalances().size());
 
-            System.out.println("\nМонети в портфелі:");
+            // Шапка таблиці
+            System.out.printf("%-5s %-15s %-10s %-15s %-10s %-20s %-25s %-10s%n",
+                "#", "Монета", "Символ", "Ціна (USD)", "Баланс", "Обсяг 24г (USD)",
+                "Ринкова капіталізація",
+                "Зміна 24г (%)");
+
             if (portfolio.getBalances().isEmpty()) {
                 System.out.println("У портфелі немає монет.");
             } else {
-                portfolio.getBalances().forEach((symbol, balance) -> {
+                int index = 1;
+                for (Map.Entry<String, BigDecimal> entry : portfolio.getBalances().entrySet()) {
+                    String symbol = entry.getKey();
+                    BigDecimal balance = entry.getValue();
+
                     Optional<Cryptocurrency> cryptoOpt = findCryptocurrency(symbol);
                     if (cryptoOpt.isPresent()) {
                         Cryptocurrency crypto = cryptoOpt.get();
+
+                        // Форматування даних з доданим відображенням балансу
                         System.out.printf(
-                            "Назва: %s | Символ: %s | Баланс: %.2f | Поточна ціна: %.2f | Вартість: %.2f%n",
-                            crypto.getName(), symbol.toUpperCase(), balance,
+                            "%-5d %-15s %-10s %-15.2f %-10.4f %-20.2f %-25.2f %-10.2f%n",
+                            index++,
+                            crypto.getName(),
+                            crypto.getSymbol(),
                             crypto.getCurrentPrice(),
-                            crypto.getCurrentPrice() * balance.doubleValue());
+                            balance, // Виведення балансу
+                            crypto.getVolume24h(),
+                            crypto.getMarketCap(),
+                            crypto.getPercentChange24h()
+                        );
                     } else {
-                        System.out.printf("Помилка: Дані про криптовалюту %s відсутні.%n", symbol);
+                        System.out.printf("%-5d %-15s %-10s Дані недоступні%n", index++, symbol,
+                            symbol);
                     }
-                });
+                }
             }
 
             // Меню дій з портфелем
@@ -294,8 +332,9 @@ public class PortfolioView implements ViewService {
                     transactionsView.display(); // Виклик сторінки транзакцій
                 }
                 case "h" -> {
-                    TransactionsView transactionsView = new TransactionsView(portfolio.getId());
-                    transactionsView.display(); // Перегляд історії транзакцій
+                    TransactionHistoryView transactionHistoryView = new TransactionHistoryView(
+                        portfolio.getId());
+                    transactionHistoryView.display();
                 }
                 case "+" -> addCryptocurrencyToPortfolio(portfolio);
                 case "-" -> removeCryptocurrencyFromPortfolio(portfolio);
@@ -322,7 +361,7 @@ public class PortfolioView implements ViewService {
 
             // Додаємо криптовалюту з початковим балансом 0
             portfolio.getBalances().put(normalizedSymbol, BigDecimal.ZERO);
-            portfolioService.calculateTotalValue(portfolio.getId());
+            portfolioService.calculateTotalValue(portfolio);
             System.out.printf(
                 "Криптовалюта %s успішно додана до портфеля %s",
                 crypto.getName(), portfolio.getName());
@@ -364,7 +403,7 @@ public class PortfolioView implements ViewService {
         }
 
         portfolio.getBalances().remove(normalizedSymbol);
-        portfolioService.calculateTotalValue(portfolio.getId());
+        portfolioService.calculateTotalValue(portfolio);
         System.out.printf("Криптовалюта %s успішно видалена з портфеля %s.%n", crypto.getName(),
             portfolio.getName());
     }

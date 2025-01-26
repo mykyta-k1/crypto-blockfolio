@@ -14,4 +14,6 @@ public interface TransactionRepository extends Repository<Transaction, UUID> {
     void addTransactionToPortfolio(UUID portfolioId, Transaction transaction);
 
     void removeTransactionFromPortfolio(UUID portfolioId, UUID transactionId);
+
+    void updateTransaction(UUID transactionId, Transaction updatedTransaction);
 }

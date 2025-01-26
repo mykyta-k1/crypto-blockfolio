@@ -1,6 +1,8 @@
 package com.crypto.blockfolio.presentation.pages;
 
+import com.crypto.blockfolio.domain.dto.TransactionAddDto;
 import com.crypto.blockfolio.persistence.entity.Portfolio;
+import com.crypto.blockfolio.persistence.entity.TransactionType;
 import com.crypto.blockfolio.presentation.ApplicationContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class TransactionsView {
     public void display() {
         System.out.println("\n=== Створення транзакції ===");
         String selectedCrypto = null;
-        String transactionType = null;
+        TransactionType transactionType = null;
         BigDecimal amount = BigDecimal.ZERO;
         BigDecimal costs = BigDecimal.ZERO;
         BigDecimal fees = BigDecimal.ZERO;
@@ -79,6 +81,7 @@ public class TransactionsView {
         }
     }
 
+
     private String selectCryptocurrency() {
         System.out.println("\nОберіть криптовалюту з портфеля:");
         List<String> cryptos = new ArrayList<>(portfolio.getBalances().keySet());
@@ -94,7 +97,7 @@ public class TransactionsView {
         }
     }
 
-    private String selectTransactionType() {
+    private TransactionType selectTransactionType() {
         System.out.println("\nОберіть тип транзакції:");
         System.out.println("[1] Купівля");
         System.out.println("[2] Продаж");
@@ -102,10 +105,10 @@ public class TransactionsView {
         System.out.println("[4] Виведення");
         int choice = inputInt("Ваш вибір:");
         return switch (choice) {
-            case 1 -> "BUY";
-            case 2 -> "SELL";
-            case 3 -> "DEPOSIT";
-            case 4 -> "WITHDRAW";
+            case 1 -> TransactionType.BUY;
+            case 2 -> TransactionType.SELL;
+            case 3 -> TransactionType.TRANSFER_DEPOSIT;
+            case 4 -> TransactionType.TRANSFER_WITHDRAWAL;
             default -> {
                 System.out.println("Невірний вибір. Спробуйте ще раз.");
                 yield null;
@@ -113,16 +116,16 @@ public class TransactionsView {
         };
     }
 
-    private void createTransaction(String crypto, String type, BigDecimal amount, BigDecimal costs,
-        BigDecimal fees, String description) {
+    private void createTransaction(String crypto, TransactionType type, BigDecimal amount,
+        BigDecimal costs, BigDecimal fees, String description) {
         BigDecimal currentBalance = portfolio.getBalances().getOrDefault(crypto, BigDecimal.ZERO);
 
         switch (type) {
-            case "BUY", "DEPOSIT" -> {
+            case BUY, TRANSFER_DEPOSIT -> {
                 portfolio.getBalances().put(crypto, currentBalance.add(amount));
                 System.out.printf("Баланс криптовалюти %s збільшено на %.2f.%n", crypto, amount);
             }
-            case "SELL", "WITHDRAW" -> {
+            case SELL, TRANSFER_WITHDRAWAL -> {
                 if (currentBalance.compareTo(amount) < 0) {
                     System.out.println("Помилка: Недостатньо балансу для цієї транзакції.");
                     return;
@@ -132,9 +135,20 @@ public class TransactionsView {
             }
         }
 
-        // Оновлення загальної вартості портфеля
-        ApplicationContext.getPortfolioService().calculateTotalValue(portfolio.getId());
+        TransactionAddDto transactionAddDto = new TransactionAddDto(
+            UUID.randomUUID(),  // Унікальний ID транзакції
+            portfolio.getId(),  // ID портфеля
+            crypto,             // Символ криптовалюти
+            type,               // Тип транзакції
+            amount,             // Кількість
+            costs,              // Витрати
+            fees,               // Комісія
+            description         // Опис
+        );
 
+        // Оновлення загальної вартості портфеля
+        ApplicationContext.getPortfolioService().calculateTotalValue(portfolio);
+        ApplicationContext.getTransactionService().addTransaction(transactionAddDto);
         System.out.println("Транзакція успішно створена!");
     }
 
