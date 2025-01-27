@@ -82,12 +82,41 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
             .filter(transaction -> portfolioId.equals(transaction.getPortfolioId()))
             .collect(Collectors.toList());
     }
-
+    /*
     @Override
     public void deleteTransaction(UUID id) {
         Transaction transaction = getTransactionById(id);
         transactionRepository.remove(transaction);
     }
+    */
+
+    @Override
+    public void deleteTransaction(UUID id) {
+        // Отримуємо існуючу транзакцію
+        Transaction transaction = getTransactionById(id);
+
+        // Отримуємо портфель, до якого належить транзакція
+        Portfolio portfolio = portfolioRepository.findById(transaction.getPortfolioId())
+            .orElseThrow(() -> new EntityNotFoundException("Портфоліо з таким ID не знайдено."));
+
+        // Видаляємо транзакцію з репозиторію
+        transactionRepository.remove(transaction);
+
+        // Видаляємо транзакцію зі списку транзакцій портфеля
+        boolean removed = portfolio.getTransactionsList().remove(transaction.getId());
+
+        if (removed) {
+            // Оновлюємо баланс портфеля
+            updatePortfolioBalance(portfolio, transaction, true);
+
+            // Зберігаємо оновлений портфель у репозиторії
+            portfolioRepository.update(portfolio);
+            System.out.println("Транзакція успішно видалена. Баланс портфеля оновлено.");
+        } else {
+            System.out.println("Транзакція не була знайдена у портфелі.");
+        }
+    }
+
 
     @Override
     public void calculatePnL(UUID transactionId) {
@@ -167,29 +196,6 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
             existingCryptocurrency); // Використовуємо `add`, щоб оновити дані
     }
 
-    /*
-    @Override
-    public void updateTransaction(UUID transactionId, TransactionAddDto updatedTransactionDto) {
-        // Отримання існуючої транзакції
-        Transaction existingTransaction = transactionRepository.findById(transactionId)
-            .orElseThrow(() -> new EntityNotFoundException("Транзакція не знайдена."));
-
-        // Оновлення полів транзакції
-        Cryptocurrency cryptocurrency = cryptocurrencyRepository
-            .findBySymbol(updatedTransactionDto.getCryptocurrencySymbol())
-            .orElseThrow(() -> new EntityNotFoundException("Криптовалюта не знайдена."));
-
-        existingTransaction.setCryptocurrency(cryptocurrency);
-        existingTransaction.setTransactionType(updatedTransactionDto.getTransactionType());
-        existingTransaction.setAmount(updatedTransactionDto.getAmount());
-        existingTransaction.setCosts(updatedTransactionDto.getCosts());
-        existingTransaction.setFees(updatedTransactionDto.getFees());
-        existingTransaction.setDescription(updatedTransactionDto.getDescription());
-
-        // Збереження змін
-        transactionRepository.updateTransaction(transactionId, existingTransaction);
-    }
-    */
     @Override
     public void updateTransaction(UUID transactionId, TransactionAddDto updatedTransactionDto) {
         // Отримання існуючої транзакції
@@ -202,7 +208,7 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
 
         // Видалення впливу існуючої транзакції
         updatePortfolioBalance(portfolio, existingTransaction, true);
-        
+
         if (updatedTransactionDto.getTransactionType() == TransactionType.SELL) {
             BigDecimal currentBalance = portfolio.getBalances()
                 .getOrDefault(updatedTransactionDto.getCryptocurrencySymbol(), BigDecimal.ZERO);
@@ -237,29 +243,35 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
         boolean reverse) {
         BigDecimal amount = transaction.getAmount();
         if (reverse) {
-            amount = amount.negate(); // Зворотня операція для відміни
+            amount = amount.negate(); // Зворотна операція для відміни
         }
 
         // Оновлення балансу відповідної криптовалюти
-        BigDecimal currentBalance = portfolio.getBalances()
-            .getOrDefault(transaction.getCryptocurrency().getSymbol(), BigDecimal.ZERO);
+        String symbol = transaction.getCryptocurrency().getSymbol();
+        BigDecimal currentBalance = portfolio.getBalances().getOrDefault(symbol, BigDecimal.ZERO);
 
+        BigDecimal updatedBalance;
         if (transaction.getTransactionType() == TransactionType.BUY ||
             transaction.getTransactionType() == TransactionType.TRANSFER_DEPOSIT) {
             if (!reverse && currentBalance.compareTo(amount) < 0) {
                 throw new IllegalArgumentException(
-                    "Недостатньо балансу для виконання операції з символом "
-                        + transaction.getCryptocurrency().getSymbol());
+                    "Недостатньо балансу для виконання операції з символом " + symbol);
             }
-            portfolio.getBalances()
-                .put(transaction.getCryptocurrency().getSymbol(), currentBalance.add(amount));
+            updatedBalance = currentBalance.add(amount);
         } else {
-            portfolio.getBalances()
-                .put(transaction.getCryptocurrency().getSymbol(), currentBalance.subtract(amount));
+            updatedBalance = currentBalance.subtract(amount);
+            // Якщо оновлений баланс стає від'ємним, встановлюємо 0
+            if (updatedBalance.compareTo(BigDecimal.ZERO) < 0) {
+                updatedBalance = BigDecimal.ZERO;
+            }
         }
+
+        // Оновлюємо баланс у портфелі
+        portfolio.getBalances().put(symbol, updatedBalance);
+
+        // Оновлюємо загальну вартість портфеля
         portfolioRepository.calculateTotalValue(portfolio.getId());
-        // Перерахунок загальної вартості портфеля
-        //calculateTotalValue(portfolio.getId());
+        System.out.println("Баланс для криптовалюти " + symbol + " оновлено: " + updatedBalance);
     }
 
 

@@ -269,19 +269,20 @@ public class PortfolioView implements ViewService {
                 .multiply(BigDecimal.valueOf(100))
                 : BigDecimal.ZERO;
 
+            BigDecimal totalPnl = portfolio.calculateTotalPnl();
             // Виведення інформації про портфель
             System.out.printf("\n=== Портфель: %s ===\n", portfolio.getName());
             System.out.printf("Вартість портфеля: %.2f$\n", totalPortfolioValue);
             System.out.printf("Зміна за 24 години: %.2f$ (%.2f%%)\n",
                 totalValueChange24h.get(),
                 percentChange24h);
+            System.out.printf("Загальний PNL: %.2f$\n", totalPnl);
             System.out.printf("Кількість монет у портфелі: %d\n", portfolio.getBalances().size());
 
             // Шапка таблиці
-            System.out.printf("%-5s %-15s %-10s %-15s %-10s %-20s %-25s %-10s%n",
+            System.out.printf("%-5s %-15s %-10s %-15s %-10s %-20s %-25s %-10s %-10s%n",
                 "#", "Монета", "Символ", "Ціна (USD)", "Баланс", "Обсяг 24г (USD)",
-                "Ринкова капіталізація",
-                "Зміна 24г (%)");
+                "Ринкова капіталізація", "Зміна 24г (%)", "PNL (USD)");
 
             if (portfolio.getBalances().isEmpty()) {
                 System.out.println("У портфелі немає монет.");
@@ -295,18 +296,16 @@ public class PortfolioView implements ViewService {
                     if (cryptoOpt.isPresent()) {
                         Cryptocurrency crypto = cryptoOpt.get();
 
-                        // Форматування даних з доданим відображенням балансу
+                        // Розрахунок PNL
+                        BigDecimal pnl = portfolio.calculatePnlForCryptocurrency(symbol);
+
+                        // Форматування даних
                         System.out.printf(
-                            "%-5d %-15s %-10s %-15.2f %-10.4f %-20.2f %-25.2f %-10.2f%n",
-                            index++,
-                            crypto.getName(),
-                            crypto.getSymbol(),
-                            crypto.getCurrentPrice(),
-                            balance, // Виведення балансу
-                            crypto.getVolume24h(),
-                            crypto.getMarketCap(),
-                            crypto.getPercentChange24h()
-                        );
+                            "%-5d %-15s %-10s %-15.2f %-10.4f %-20.2f %-25.2f %-10.2f %-10.2f%n",
+                            index++, crypto.getName(), crypto.getSymbol(), crypto.getCurrentPrice(),
+                            balance,
+                            crypto.getVolume24h(), crypto.getMarketCap(),
+                            crypto.getPercentChange24h(), pnl);
                     } else {
                         System.out.printf("%-5d %-15s %-10s Дані недоступні%n", index++, symbol,
                             symbol);

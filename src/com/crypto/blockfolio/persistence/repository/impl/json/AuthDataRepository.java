@@ -9,21 +9,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+/**
+ * Репозиторій для роботи з файлами аутентифікаційних даних у форматі JSON. Забезпечує збереження,
+ * завантаження та очищення даних аутентифікації.
+ */
 public class AuthDataRepository {
 
+    /**
+     * Шлях до файлу з даними аутентифікації.
+     */
     private static final Path AUTH_DATA_FILE = Path.of("data", "auth_data.json");
+
+    /**
+     * Об'єкт для серіалізації та десеріалізації JSON.
+     */
     private final Gson gson;
 
+    /**
+     * Конструктор, який ініціалізує репозиторій і перевіряє існування файлу аутентифікації.
+     */
     public AuthDataRepository() {
         this.gson = new Gson();
         initializeFile();
     }
 
     /**
-     * Saves the authentication data to the file.
+     * Зберігає дані аутентифікації у файл.
      *
-     * @param username     The username.
-     * @param passwordHash The hashed password.
+     * @param username     ім'я користувача.
+     * @param passwordHash хешований пароль.
+     * @throws JsonFileIOException у разі помилки запису у файл.
      */
     public void save(String username, String passwordHash) {
         try (FileWriter writer = new FileWriter(AUTH_DATA_FILE.toFile())) {
@@ -34,9 +49,11 @@ public class AuthDataRepository {
     }
 
     /**
-     * Loads authentication data from the file.
+     * Завантажує дані аутентифікації з файлу.
      *
-     * @return An Optional containing username and password hash, or empty if not available.
+     * @return {@link Optional}, що містить масив з іменем користувача і хешованим паролем, або
+     * {@code Optional.empty()}, якщо файл не існує чи порожній.
+     * @throws JsonFileIOException у разі помилки читання файлу.
      */
     public Optional<String[]> load() {
         if (!Files.exists(AUTH_DATA_FILE)) {
@@ -51,7 +68,9 @@ public class AuthDataRepository {
     }
 
     /**
-     * Clears the authentication data file.
+     * Очищає файл даних аутентифікації.
+     *
+     * @throws JsonFileIOException у разі помилки видалення файлу.
      */
     public void clear() {
         try {
@@ -62,7 +81,9 @@ public class AuthDataRepository {
     }
 
     /**
-     * Initializes the auth data file if it does not exist.
+     * Ініціалізує файл аутентифікації, створюючи його, якщо він не існує.
+     *
+     * @throws JsonFileIOException у разі помилки створення файлу.
      */
     private void initializeFile() {
         try {

@@ -11,9 +11,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Реалізація репозиторію для роботи з портфелями у форматі JSON. Забезпечує збереження, пошук,
+ * оновлення та управління портфелями.
+ */
 public final class PortfolioJsonRepositoryImpl extends
     GenericJsonRepository<Portfolio, UUID> implements PortfolioRepository {
 
+    /**
+     * Конструктор для ініціалізації репозиторію портфелів.
+     *
+     * @param gson об'єкт для серіалізації та десеріалізації JSON.
+     */
     public PortfolioJsonRepositoryImpl(Gson gson) {
         super(
             gson,
@@ -23,6 +32,12 @@ public final class PortfolioJsonRepositoryImpl extends
         );
     }
 
+    /**
+     * Знаходить портфель за його назвою.
+     *
+     * @param name назва портфеля.
+     * @return {@link Optional}, що містить портфель, якщо його знайдено.
+     */
     @Override
     public Optional<Portfolio> findByName(String name) {
         return entities.stream()
@@ -30,6 +45,13 @@ public final class PortfolioJsonRepositoryImpl extends
             .findFirst();
     }
 
+    /**
+     * Додає криптовалюту до портфеля.
+     *
+     * @param portfolioId          ідентифікатор портфеля.
+     * @param cryptocurrencySymbol символ криптовалюти.
+     * @param amount               кількість криптовалюти для додавання.
+     */
     @Override
     public void addCryptocurrency(UUID portfolioId, String cryptocurrencySymbol,
         BigDecimal amount) {
@@ -40,6 +62,12 @@ public final class PortfolioJsonRepositoryImpl extends
         saveChanges();
     }
 
+    /**
+     * Видаляє криптовалюту з портфеля.
+     *
+     * @param portfolioId          ідентифікатор портфеля.
+     * @param cryptocurrencySymbol символ криптовалюти.
+     */
     @Override
     public void removeCryptocurrency(UUID portfolioId, String cryptocurrencySymbol) {
         Portfolio portfolio = findById(portfolioId)
@@ -49,6 +77,12 @@ public final class PortfolioJsonRepositoryImpl extends
         saveChanges();
     }
 
+    /**
+     * Додає транзакцію до портфеля.
+     *
+     * @param portfolioId   ідентифікатор портфеля.
+     * @param transactionId ідентифікатор транзакції.
+     */
     @Override
     public void addTransaction(UUID portfolioId, UUID transactionId) {
         Portfolio portfolio = findById(portfolioId)
@@ -60,6 +94,12 @@ public final class PortfolioJsonRepositoryImpl extends
         saveChanges();
     }
 
+    /**
+     * Видаляє транзакцію з портфеля.
+     *
+     * @param portfolioId   ідентифікатор портфеля.
+     * @param transactionId ідентифікатор транзакції.
+     */
     @Override
     public void removeTransaction(UUID portfolioId, UUID transactionId) {
         Portfolio portfolio = findById(portfolioId)
@@ -71,6 +111,12 @@ public final class PortfolioJsonRepositoryImpl extends
         saveChanges();
     }
 
+    /**
+     * Повертає всі транзакції, пов'язані з портфелем.
+     *
+     * @param portfolioId ідентифікатор портфеля.
+     * @return набір ідентифікаторів транзакцій.
+     */
     @Override
     public Set<UUID> getTransactions(UUID portfolioId) {
         Portfolio portfolio = findById(portfolioId)
@@ -79,6 +125,12 @@ public final class PortfolioJsonRepositoryImpl extends
         return portfolio.getTransactionsList();
     }
 
+    /**
+     * Обчислює загальну вартість портфеля.
+     *
+     * @param portfolioId ідентифікатор портфеля.
+     * @return загальна вартість портфеля.
+     */
     @Override
     public BigDecimal calculateTotalValue(UUID portfolioId) {
         Portfolio portfolio = findById(portfolioId)
@@ -88,6 +140,12 @@ public final class PortfolioJsonRepositoryImpl extends
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    /**
+     * Повертає список криптовалют, які відстежуються у портфелі.
+     *
+     * @param portfolioId ідентифікатор портфеля.
+     * @return набір символів криптовалют.
+     */
     @Override
     public Set<String> getTrackedCryptocurrencies(UUID portfolioId) {
         Portfolio portfolio = findById(portfolioId)
@@ -96,6 +154,12 @@ public final class PortfolioJsonRepositoryImpl extends
         return portfolio.getBalances().keySet();
     }
 
+    /**
+     * Знаходить криптовалюту у портфелях за її символом.
+     *
+     * @param symbol символ криптовалюти.
+     * @return {@link Optional}, що містить криптовалюту, якщо її знайдено.
+     */
     @Override
     public Optional<Cryptocurrency> findCryptocurrencyBySymbol(String symbol) {
         return entities.stream()
@@ -105,6 +169,11 @@ public final class PortfolioJsonRepositoryImpl extends
             .findFirst();
     }
 
+    /**
+     * Оновлює дані портфеля у репозиторії.
+     *
+     * @param portfolio портфель для оновлення.
+     */
     @Override
     public void update(Portfolio portfolio) {
         UUID id = portfolio.getId();

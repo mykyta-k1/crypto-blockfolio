@@ -8,9 +8,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Реалізація репозиторію для роботи з користувачами у форматі JSON. Забезпечує збереження, пошук,
+ * оновлення та управління портфелями користувачів.
+ */
 public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UUID> implements
     UserRepository {
 
+    /**
+     * Конструктор для ініціалізації репозиторію користувачів.
+     *
+     * @param gson об'єкт для серіалізації та десеріалізації JSON.
+     */
     public UserJsonRepositoryImpl(Gson gson) {
         super(
             gson,
@@ -20,6 +29,12 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
         );
     }
 
+    /**
+     * Знаходить користувача за логіном.
+     *
+     * @param username логін користувача.
+     * @return {@link Optional}, що містить користувача, якщо його знайдено.
+     */
     @Override
     public Optional<User> findByUsername(String username) {
         return entities.stream()
@@ -28,6 +43,12 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
             .findFirst();
     }
 
+    /**
+     * Знаходить користувача за електронною поштою.
+     *
+     * @param email електронна пошта користувача.
+     * @return {@link Optional}, що містить користувача, якщо його знайдено.
+     */
     @Override
     public Optional<User> findByEmail(String email) {
         return entities.stream()
@@ -35,6 +56,12 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
             .findFirst();
     }
 
+    /**
+     * Оновлює інформацію про користувача.
+     *
+     * @param user користувач для оновлення.
+     * @throws IllegalArgumentException якщо користувач не знайдений.
+     */
     @Override
     public void update(User user) {
         Optional<User> existingUser = findById(user.getId());
@@ -49,6 +76,13 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
         }
     }
 
+    /**
+     * Додає портфель до користувача.
+     *
+     * @param userId      ідентифікатор користувача.
+     * @param portfolioId ідентифікатор портфеля.
+     * @throws IllegalArgumentException якщо користувача не знайдено або портфель вже додано.
+     */
     @Override
     public void addPortfolio(UUID userId, UUID portfolioId) {
         findById(userId).ifPresentOrElse(user -> {
@@ -62,6 +96,14 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
         });
     }
 
+    /**
+     * Видаляє портфель з користувача.
+     *
+     * @param userId      ідентифікатор користувача.
+     * @param portfolioId ідентифікатор портфеля.
+     * @throws IllegalArgumentException якщо користувача не знайдено або портфель не належить
+     *                                  користувачу.
+     */
     @Override
     public void removePortfolio(UUID userId, UUID portfolioId) {
         findById(userId).ifPresentOrElse(user -> {
@@ -74,6 +116,13 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
         });
     }
 
+    /**
+     * Перевіряє, чи належить портфель користувачу.
+     *
+     * @param userId      ідентифікатор користувача.
+     * @param portfolioId ідентифікатор портфеля.
+     * @return {@code true}, якщо портфель належить користувачу, інакше {@code false}.
+     */
     @Override
     public boolean ownsPortfolio(UUID userId, UUID portfolioId) {
         return findById(userId)
@@ -81,6 +130,13 @@ public final class UserJsonRepositoryImpl extends GenericJsonRepository<User, UU
             .orElse(false);
     }
 
+    /**
+     * Повертає список портфелів, пов'язаних із користувачем.
+     *
+     * @param userId ідентифікатор користувача.
+     * @return набір ідентифікаторів портфелів.
+     * @throws IllegalArgumentException якщо користувача не знайдено.
+     */
     @Override
     public Set<UUID> getPortfolios(UUID userId) {
         return findById(userId)

@@ -8,10 +8,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Реалізація репозиторію для роботи з транзакціями у форматі JSON. Забезпечує збереження, пошук,
+ * оновлення та видалення транзакцій.
+ */
 public final class TransactionJsonRepositoryImpl
     extends GenericJsonRepository<Transaction, UUID>
     implements TransactionRepository {
 
+    /**
+     * Конструктор для ініціалізації репозиторію транзакцій.
+     *
+     * @param gson об'єкт для серіалізації та десеріалізації JSON.
+     */
     public TransactionJsonRepositoryImpl(Gson gson) {
         super(
             gson,
@@ -21,6 +30,12 @@ public final class TransactionJsonRepositoryImpl
         );
     }
 
+    /**
+     * Знаходить всі транзакції, пов'язані з певним портфелем.
+     *
+     * @param portfolioId ідентифікатор портфеля.
+     * @return набір транзакцій, пов'язаних із вказаним портфелем.
+     */
     @Override
     public Set<Transaction> findByPortfolioId(UUID portfolioId) {
         return entities.stream()
@@ -28,6 +43,12 @@ public final class TransactionJsonRepositoryImpl
             .collect(Collectors.toSet());
     }
 
+    /**
+     * Знаходить всі транзакції для певної криптовалюти за її символом.
+     *
+     * @param cryptocurrencySymbol символ криптовалюти.
+     * @return набір транзакцій, що відповідають вказаному символу криптовалюти.
+     */
     @Override
     public Set<Transaction> findByCryptocurrencySymbol(String cryptocurrencySymbol) {
         return entities.stream()
@@ -36,6 +57,13 @@ public final class TransactionJsonRepositoryImpl
             .collect(Collectors.toSet());
     }
 
+    /**
+     * Додає транзакцію до портфеля.
+     *
+     * @param portfolioId ідентифікатор портфеля.
+     * @param transaction транзакція, яку потрібно додати.
+     * @throws IllegalArgumentException якщо транзакція або ID портфеля є {@code null}.
+     */
     @Override
     public void addTransactionToPortfolio(UUID portfolioId, Transaction transaction) {
         if (transaction == null || portfolioId == null) {
@@ -47,6 +75,13 @@ public final class TransactionJsonRepositoryImpl
         saveChanges();
     }
 
+    /**
+     * Видаляє транзакцію з портфеля.
+     *
+     * @param portfolioId   ідентифікатор портфеля.
+     * @param transactionId ідентифікатор транзакції, яку потрібно видалити.
+     * @throws IllegalArgumentException якщо транзакція не знайдена або не належить портфелю.
+     */
     @Override
     public void removeTransactionFromPortfolio(UUID portfolioId, UUID transactionId) {
         Transaction transaction = findById(transactionId)
@@ -60,6 +95,13 @@ public final class TransactionJsonRepositoryImpl
         saveChanges();
     }
 
+    /**
+     * Оновлює дані транзакції у репозиторії.
+     *
+     * @param transactionId      ідентифікатор транзакції.
+     * @param updatedTransaction оновлена транзакція.
+     * @throws IllegalArgumentException якщо транзакція не знайдена.
+     */
     @Override
     public void updateTransaction(UUID transactionId, Transaction updatedTransaction) {
         Transaction existingTransaction = findById(transactionId)
@@ -71,6 +113,4 @@ public final class TransactionJsonRepositoryImpl
         existingTransaction.setDescription(updatedTransaction.getDescription());
         saveChanges();
     }
-
-
 }

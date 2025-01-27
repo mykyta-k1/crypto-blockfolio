@@ -10,7 +10,6 @@ import com.crypto.blockfolio.persistence.repository.contracts.PortfolioRepositor
 import com.crypto.blockfolio.persistence.repository.contracts.TransactionRepository;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -97,62 +96,7 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
         portfolio.removeCryptocurrency(cryptocurrency);
         portfolioRepository.add(portfolio);
     }
-
-    @Override
-    public void calculateTotalValue(Portfolio portfolio) {
-        try {
-            BigDecimal totalValue = portfolio.getBalances().entrySet().stream()
-                .map(entry -> {
-                    String symbol = entry.getKey();
-                    BigDecimal balance = entry.getValue();
-
-                    // Отримуємо криптовалюту через репозиторій
-                    Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(symbol)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                            "Криптовалюта з символом " + symbol + " не знайдена"));
-
-                    // Обчислюємо вартість
-                    return BigDecimal.valueOf(cryptocurrency.getCurrentPrice()).multiply(balance);
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add); // Сума вартостей
-
-            portfolio.setTotalValue(totalValue);
-            portfolioRepository.update(portfolio); // Збереження оновленого портфеля
-        } catch (Exception e) {
-            logger.error("Помилка підрахунку вартості для портфеля: {}", portfolio.getId(), e);
-        }
-    }
-
-    /*
-    @Override
-    public void calculateTotalValue(UUID portfolioId) {
-        try {
-            Portfolio portfolio = getPortfolioById(portfolioId);
-
-            BigDecimal totalValue = portfolio.getBalances().entrySet().stream()
-                .map(entry -> {
-                    String symbol = entry.getKey();
-                    BigDecimal balance = entry.getValue();
-
-                    // Отримуємо криптовалюту через репозиторій
-                    Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(symbol)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                            "Криптовалюта з символом " + symbol + " не знайдена"));
-
-                    // Обчислюємо вартість
-                    return BigDecimal.valueOf(cryptocurrency.getCurrentPrice()).multiply(balance);
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add); // Сума вартостей
-
-            portfolio.setTotalValue(totalValue);
-            portfolioRepository.update(portfolio); // Збереження оновленого портфеля
-            //logger.info("Підрахунок загальної вартості для портфеля: {}", portfolioId);
-        } catch (Exception e) {
-            logger.error("Помилка підрахунку вартості для портфеля: {}", portfolioId, e);
-        }
-    }
-    */
-
+    
     @Override
     public void generateReport(Predicate<Portfolio> filter) {
         Workbook workbook = new HSSFWorkbook();
@@ -190,4 +134,10 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
                 "Помилка при збереженні звіту портфелів: %s".formatted(e.getMessage()));
         }
     }
+
+    @Override
+    public void calculateTotalValue(Portfolio portfolio) {
+        portfolio.calculateTotalValue(cryptocurrencyRepository);
+    }
+
 }

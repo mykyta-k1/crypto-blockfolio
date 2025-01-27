@@ -8,6 +8,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * DTO (Data Transfer Object) для створення користувача. Використовується для передачі даних,
+ * необхідних для створення користувача в системі.
+ */
 public final class UserAddDto extends Entity {
 
     private final String username;
@@ -15,6 +19,16 @@ public final class UserAddDto extends Entity {
     private final String email;
     private final Set<UUID> portfolios;
 
+    /**
+     * Конструктор для створення нового екземпляра {@link UserAddDto}.
+     *
+     * @param id          унікальний ідентифікатор користувача.
+     * @param username    логін користувача.
+     * @param rawPassword незашифрований пароль користувача.
+     * @param email       електронна пошта користувача.
+     * @param portfolios  набір ідентифікаторів портфелів, які належать користувачу.
+     * @throws EntityArgumentException якщо вхідні дані некоректні.
+     */
     public UserAddDto(UUID id, String username, String rawPassword, String email,
         Set<UUID> portfolios) {
         super(id);
@@ -28,6 +42,12 @@ public final class UserAddDto extends Entity {
         }
     }
 
+    /**
+     * Перевіряє та повертає логін користувача.
+     *
+     * @param username логін користувача для перевірки.
+     * @return перевірений логін.
+     */
     private String validateUsername(String username) {
         ValidationUtils.validateRequired(username, "логіну", errors);
         ValidationUtils.validateLength(username, 4, 24, "логіну", errors);
@@ -35,6 +55,12 @@ public final class UserAddDto extends Entity {
         return username;
     }
 
+    /**
+     * Перевіряє та повертає незашифрований пароль користувача.
+     *
+     * @param password пароль користувача для перевірки.
+     * @return перевірений пароль.
+     */
     private String validatePassword(String password) {
         ValidationUtils.validateRequired(password, "паролю", errors);
         if (password != null && password.length() < 8) {
@@ -46,6 +72,12 @@ public final class UserAddDto extends Entity {
         return password;
     }
 
+    /**
+     * Перевіряє та повертає електронну пошту користувача.
+     *
+     * @param email електронна пошта для перевірки.
+     * @return перевірена електронна пошта.
+     */
     private String validateEmail(String email) {
         ValidationUtils.validateRequired(email, "електронної пошти", errors);
         ValidationUtils.validatePattern(email, "^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$",
@@ -53,6 +85,13 @@ public final class UserAddDto extends Entity {
         return email;
     }
 
+
+    /**
+     * Перевіряє та повертає набір ідентифікаторів портфелів.
+     *
+     * @param portfolios набір портфелів для перевірки.
+     * @return перевірений набір портфелів.
+     */
     private Set<UUID> validatePortfolios(Set<UUID> portfolios) {
         if (portfolios == null) {
             return new LinkedHashSet<>();
@@ -63,18 +102,39 @@ public final class UserAddDto extends Entity {
         return new LinkedHashSet<>(portfolios);
     }
 
+    /**
+     * Повертає логін користувача.
+     *
+     * @return логін користувача.
+     */
     public String getUsername() {
         return username;
     }
 
+
+    /**
+     * Повертає незашифрований пароль користувача.
+     *
+     * @return незашифрований пароль.
+     */
     public String getRawPassword() {
         return rawPassword;
     }
 
+    /**
+     * Повертає електронну пошту користувача.
+     *
+     * @return електронна пошта користувача.
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Повертає набір ідентифікаторів портфелів користувача.
+     *
+     * @return набір ідентифікаторів портфелів.
+     */
     public Set<UUID> getPortfolios() {
         return portfolios;
     }

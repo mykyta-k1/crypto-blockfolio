@@ -1,12 +1,10 @@
 [
   {
-    "password": "$2a$10$phnAxe4ugQ9JFDyPASz2DeAHVwdL6esZF/IRRIUBEwfh67Xy6Cufm",
-    "createdAt": "2025-01-25T19:14:12.0141172",
+    "password": "$2a$10$wzFa0x9G./LIELQdLsGPO.LmGB3RzEISPsylkqToX2kB6lW5BLZ16",
+    "createdAt": "2025-01-27T00:00:33.0070605",
     "username": "Mykyta",
     "email": "c.kryvobokov.mykyta@student.uzhnu.edu.ua",
-    "portfolios": [
-      "9876a687-679c-4172-a19d-9ee7ddf1072a"
-    ],
-    "id": "fad9f9c3-1df6-4547-b40d-7084029b6c47"
+    "portfolios": [],
+    "id": "64efa75c-3de9-4553-8703-e7f628c951d7"
   }
 ]
