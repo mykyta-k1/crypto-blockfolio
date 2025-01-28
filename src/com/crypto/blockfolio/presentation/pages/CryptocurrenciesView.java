@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class CryptocurrenciesView implements ViewService {
 
-    private static final int PAGE_SIZE = 20; // Кількість монет на сторінку
+    private static final int PAGE_SIZE = 20;
     private final CryptocurrencyService cryptocurrencyService;
     private final Scanner scanner;
 
@@ -21,9 +21,15 @@ public class CryptocurrenciesView implements ViewService {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Відображає каталог криптовалют із підтримкою пагінації. Дані завантажуються асинхронно через
+     * {@link CryptocurrencyService}. У разі помилок завантаження виводить повідомлення про
+     * недоступність даних.
+     */
     @Override
     public void display() {
-        System.out.println("=== Перегляд усіх криптовалют ===");
+        System.out.println("\n📊 КАТАЛОГ КРИПТОВАЛЮТ");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
         // Використання CompletableFuture для асинхронного завантаження
         List<Cryptocurrency> cryptocurrencies;
@@ -32,17 +38,17 @@ public class CryptocurrenciesView implements ViewService {
                 try {
                     return cryptocurrencyService.getAllCryptocurrencies();
                 } catch (Exception e) {
-                    System.err.printf("Помилка завантаження даних: %s%n", e.getMessage());
+                    System.err.println("⚠️ Помилка завантаження даних: " + e.getMessage());
                     return new ArrayList<Cryptocurrency>();
                 }
-            }).thenApply(result -> result).join(); // Уточнення типу
+            }).thenApply(result -> result).join();
         } catch (Exception e) {
-            System.err.printf("Помилка під час завантаження: %s%n", e.getMessage());
+            System.out.println("📭 На жаль, дані про криптовалюти тимчасово недоступні");
             return;
         }
 
         if (cryptocurrencies.isEmpty()) {
-            System.out.println("Немає даних про криптовалюти.");
+            System.out.println("📭 На жаль, дані про криптовалюти тимчасово недоступні");
             return;
         }
 
@@ -59,63 +65,74 @@ public class CryptocurrenciesView implements ViewService {
                 displayCryptocurrencyDetails(i + 1, crypto);
             }
 
-            // Показуємо меню пагінації
-            System.out.println("\n[0] Повернутися назад");
+            System.out.println("\n📑 НАВІГАЦІЯ");
+            System.out.println("━━━━━━━━━━━");
+            System.out.println("0. 🔙 Повернутися");
             if (currentPage > 1) {
-                System.out.println("[p] Попередня сторінка");
+                System.out.println("◀️ [P] Попередня сторінка");
             }
             if (currentPage < totalPages) {
-                System.out.println("[n] Наступна сторінка");
+                System.out.println("▶️ [N] Наступна сторінка");
             }
-            System.out.printf("\nСторінка %d з %d%n", currentPage, totalPages);
-            System.out.print("Ваш вибір: ");
+            System.out.printf("\n📄 Сторінка %d з %d%n", currentPage, totalPages);
+            System.out.print("✨ Ваш вибір: ");
             String input = scanner.nextLine().trim().toLowerCase();
 
             switch (input) {
                 case "0" -> {
-                    return; // Повернення до попереднього меню
+                    return;
                 }
                 case "p" -> {
                     if (currentPage > 1) {
                         currentPage--;
                     } else {
-                        System.out.println("Це перша сторінка.");
+                        System.out.println("⚠️ Ви вже на першій сторінці");
                     }
                 }
                 case "n" -> {
                     if (currentPage < totalPages) {
                         currentPage++;
                     } else {
-                        System.out.println("Це остання сторінка.");
+                        System.out.println("⚠️ Ви вже на останній сторінці");
                     }
                 }
-                default -> System.out.println("Невірний вибір. Спробуйте ще раз.");
+                default -> System.out.println("❌ Невірний вибір. Оберіть доступну опцію.");
             }
         }
     }
 
-
+    /**
+     * Відображає детальну інформацію про криптовалюту, включаючи символ, назву, ціну,
+     * капіталізацію, об'єм за 24 години та зміну ціни.
+     *
+     * @param index  позиція криптовалюти у списку.
+     * @param crypto екземпляр криптовалюти для відображення.
+     */
     private void displayCryptocurrencyDetails(int index, Cryptocurrency crypto) {
         // Формат для стандартних чисел
         DecimalFormat standardFormat = new DecimalFormat("#,##0.00");
         // Формат для малих чисел (з більшою точністю)
         DecimalFormat smallNumberFormat = new DecimalFormat("#,##0.00000000");
 
-        // Поточна ціна
         String currentPriceFormatted;
         if (crypto.getCurrentPrice() < 1) {
             currentPriceFormatted = smallNumberFormat.format(crypto.getCurrentPrice());
         } else {
             currentPriceFormatted = standardFormat.format(crypto.getCurrentPrice());
         }
-
-        // Вивід
-        System.out.printf("\n%d. Назва: %s (%s)%n", index, crypto.getName(), crypto.getSymbol());
-        System.out.printf("   Поточна ціна: %s USD%n", currentPriceFormatted);
-        System.out.printf("   Ринкова капіталізація: %s USD%n",
+        System.out.printf("\n%d. %s %s (%s)%n",
+            index,
+            crypto.getSymbol().equals("BTC") ? "₿" : "🪙",
+            crypto.getName(),
+            crypto.getSymbol()
+        );
+        System.out.printf("   💵 Ціна: %s USD%n", currentPriceFormatted);
+        System.out.printf("   💰 Капіталізація: %s USD%n",
             standardFormat.format(crypto.getMarketCap()));
-        System.out.printf("   Обсяг за 24 години: %s USD%n",
+        System.out.printf("   📈 Об'єм (24г): %s USD%n",
             standardFormat.format(crypto.getVolume24h()));
-        System.out.printf("   Зміна за 24 години: %.2f%%%n", crypto.getPercentChange24h());
+        double change = crypto.getPercentChange24h();
+        String changeEmoji = change > 0 ? "🟢" : (change < 0 ? "🔴" : "⚪");
+        System.out.printf("   %s Зміна (24г): %+.2f%%%n", changeEmoji, change);
     }
 }

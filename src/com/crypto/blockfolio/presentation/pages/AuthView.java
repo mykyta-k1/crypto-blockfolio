@@ -7,6 +7,9 @@ import com.crypto.blockfolio.presentation.ApplicationContext;
 import com.crypto.blockfolio.presentation.ViewService;
 import java.util.Scanner;
 
+/**
+ * Клас відповідає за авторизацію користувача
+ */
 public class AuthView implements ViewService {
 
     private final AuthService authService;
@@ -17,6 +20,13 @@ public class AuthView implements ViewService {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Відображає інтерфейс авторизації користувача, дозволяє ввести логін та пароль. Виконує
+     * перевірку облікових даних через {@link AuthService}.
+     *
+     * @throws UserAlreadyAuthException якщо користувач вже автентифікований.
+     * @throws AuthException            якщо введені облікові дані неправильні.
+     */
     @Override
     public void display() {
         try {
@@ -51,6 +61,10 @@ public class AuthView implements ViewService {
         }
     }
 
+    /**
+     * Перенаправляє користувача до головного меню. Використовується в разі невдачі при авторизації
+     * або виключення.
+     */
     private void redirectToMainMenu() {
         RedirectView redirectView = new RedirectView();
         redirectView.display();

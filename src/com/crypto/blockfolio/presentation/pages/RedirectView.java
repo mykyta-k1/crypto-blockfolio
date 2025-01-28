@@ -8,15 +8,21 @@ import java.util.Scanner;
  */
 public class RedirectView implements ViewService {
 
+    /**
+     * Відображає меню перенаправлення. Користувач може обрати один з варіантів: реєстрація,
+     * авторизація, або вихід. У разі некоректного введення показується відповідне повідомлення про
+     * помилку.
+     */
     @Override
     public void display() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== Вибір дії ===");
-        System.out.println("1. Реєстрація");
-        System.out.println("2. Увійти");
-        System.out.println("3. Вийти");
-        System.out.print("Введіть номер дії: ");
+        System.out.println("\n🔹━━━━━━ МЕНЮ ━━━━━━🔹");
+        System.out.println("1. ✨ Реєстрація");
+        System.out.println("2. 🔑 Увійти");
+        System.out.println("3. 🚪 Вийти");
+        System.out.println("━━━━━━━━━━━━━━━━━━━");
+        System.out.print("📝 Введіть номер дії: ");
 
         try {
             int choice = Integer.parseInt(scanner.nextLine());

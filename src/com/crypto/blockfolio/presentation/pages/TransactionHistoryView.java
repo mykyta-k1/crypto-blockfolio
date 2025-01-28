@@ -23,6 +23,10 @@ public class TransactionHistoryView implements ViewService {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Відображає список транзакцій для поточного портфеля. Користувач може переглядати, редагувати
+     * або видаляти транзакції, а також повертатися до попереднього меню.
+     */
     @Override
     public void display() {
         while (true) {
@@ -35,7 +39,6 @@ public class TransactionHistoryView implements ViewService {
                 break;
             }
 
-            // Виведення списку транзакцій
             for (int i = 0; i < transactions.size(); i++) {
                 Transaction transaction = transactions.get(i);
                 System.out.printf(
@@ -47,7 +50,7 @@ public class TransactionHistoryView implements ViewService {
                     transaction.getFees(),
                     transaction.getDescription() != null ? transaction.getDescription()
                         : "Без опису",
-                    transaction.getCreatedAt().toString() // Додано час створення
+                    transaction.getCreatedAt().toString()
                 );
             }
 
@@ -81,7 +84,12 @@ public class TransactionHistoryView implements ViewService {
         }
     }
 
-
+    /**
+     * Редагує деталі транзакції. Користувач може змінити криптовалюту, тип транзакції, кількість,
+     * витрати, комісію та опис.
+     *
+     * @param transaction Транзакція, яку необхідно відредагувати.
+     */
     private void editTransaction(Transaction transaction) {
         UUID transactionId = transaction.getId();
         String selectedCrypto = transaction.getCryptocurrency().getSymbol();
@@ -175,7 +183,12 @@ public class TransactionHistoryView implements ViewService {
             .containsKey(cryptocurrencySymbol);
     }
 
-
+    /**
+     * Видаляє вибрану транзакцію із списку транзакцій. Користувач обирає номер транзакції для
+     * видалення.
+     *
+     * @param transactions Список транзакцій для вибору.
+     */
     private void removeTransaction(List<Transaction> transactions) {
         if (transactions.isEmpty()) {
             System.out.println("Транзакцій немає для видалення.");

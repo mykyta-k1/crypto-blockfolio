@@ -20,13 +20,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
     PortfolioService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PortfolioServiceImpl.class);
     private final PortfolioRepository portfolioRepository;
     private final CryptocurrencyRepository cryptocurrencyRepository;
     private final TransactionRepository transactionRepository;
@@ -96,9 +93,9 @@ class PortfolioServiceImpl extends GenericService<Portfolio, UUID> implements
         portfolio.removeCryptocurrency(cryptocurrency);
         portfolioRepository.add(portfolio);
     }
-    
+
     @Override
-    public void generateReport(Predicate<Portfolio> filter) {
+    public void generateReport(Path savePath, Predicate<Portfolio> filter) {
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Portfolios");
 

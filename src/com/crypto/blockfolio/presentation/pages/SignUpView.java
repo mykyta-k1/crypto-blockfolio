@@ -22,53 +22,57 @@ public class SignUpView implements ViewService {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Відображає процес реєстрації нового користувача. Користувач вводить свої дані (логін, пароль,
+     * email), які перевіряються на унікальність. У разі виявлення помилок реєстрація переривається,
+     * а користувач отримує повідомлення про помилки. Успішна реєстрація завершується переходом до
+     * головного меню.
+     */
     @Override
     public void display() {
         try {
-            System.out.println("\n=== Реєстрація користувача ===");
+            System.out.println("\n✨ РЕЄСТРАЦІЯ НОВОГО КОРИСТУВАЧА");
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
             // Введення даних користувача
-            System.out.print("Введіть логін: ");
+            System.out.print("👤 Логін: ");
             String username = scanner.nextLine();
 
-            System.out.print("Введіть пароль: ");
+            System.out.print("🔒 Пароль: ");
             String password = scanner.nextLine();
 
-            System.out.print("Введіть email: ");
+            System.out.print("📧 Email: ");
             String email = scanner.nextLine();
 
-            // Перевірка на існуючого користувача
             if (userService.getAll().stream().anyMatch(user ->
                 user.getUsername().equalsIgnoreCase(username) ||
                     user.getEmail().equalsIgnoreCase(email))) {
-                System.err.println("Помилка: Користувач із таким логіном або email вже існує.");
+                System.err.println("❌ Користувач із таким логіном або email вже існує");
                 redirectToMainMenu();
                 return;
             }
 
-            // Створення DTO користувача
             UserAddDto userAddDto = new UserAddDto(UUID.randomUUID(), username, password, email,
                 null);
 
-            // Генерація та відправлення коду підтвердження
-            System.out.println("На вашу пошту надіслано код підтвердження.");
+            System.out.println("📨 Код підтвердження надіслано на вашу пошту");
             signUpService.signUp(userAddDto, () -> {
-                System.out.print("Введіть код підтвердження: ");
+                System.out.print("🔑 Введіть код підтвердження: ");
                 return scanner.nextLine();
             });
 
-            System.out.println("Користувач успішно зареєстрований!");
+            System.out.println("✅ Реєстрація успішна! Ласкаво просимо!");
             DashBoardView dashBoardView = new DashBoardView();
             dashBoardView.display();
         } catch (SignUpException e) {
-            System.err.println("Помилка реєстрації: " + e.getMessage());
+            System.err.println("❌ Помилка реєстрації: " + e.getMessage());
             redirectToMainMenu();
         } catch (EntityArgumentException e) {
-            System.err.println("Некоректні дані користувача:");
+            System.err.println("\n⚠️ Виявлено помилки в даних:");
             e.getErrors().forEach(error -> System.err.println("- " + error));
             redirectToMainMenu();
         } catch (Exception e) {
-            System.err.println("Несподівана помилка: " + e.getMessage());
+            System.err.println("❌ Помилка реєстрації: " + e.getMessage());
             redirectToMainMenu();
         }
     }

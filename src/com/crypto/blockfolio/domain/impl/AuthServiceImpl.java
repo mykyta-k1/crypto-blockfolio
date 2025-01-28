@@ -52,6 +52,7 @@ class AuthServiceImpl implements AuthService {
         if (user == null) {
             throw new UserAlreadyAuthException("Ви ще не автентифікавані.");
         }
+        authDataRepository.clear();
         user = null;
     }
 

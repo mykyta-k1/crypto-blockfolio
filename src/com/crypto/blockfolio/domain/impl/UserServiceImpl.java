@@ -87,7 +87,7 @@ class UserServiceImpl extends GenericService<User, UUID> implements UserService 
     }
 
     @Override
-    public void generateReport(Predicate<User> filter) {
+    public void generateReport(Path savePath, Predicate<User> filter) {
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Users");
 
@@ -123,4 +123,14 @@ class UserServiceImpl extends GenericService<User, UUID> implements UserService 
                 "Помилка при збереженні звіту користувачів: %s".formatted(e.getMessage()));
         }
     }
+
+    @Override
+    public void update(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не може бути null.");
+        }
+
+        userRepository.update(user);
+    }
+
 }

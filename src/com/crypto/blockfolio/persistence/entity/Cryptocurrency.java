@@ -52,7 +52,7 @@ public class Cryptocurrency extends CryptoEntity implements Comparable<Cryptocur
         this.percentChange24h = percentChange24h;
         this.lastUpdated = validateLastUpdated(lastUpdated);
 
-        if (isValid()) {
+        if (!isValid()) {
             throw new EntityArgumentException(errors);
         }
     }

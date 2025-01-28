@@ -1,0 +1,20 @@
+[
+  {
+    "portfolioId": "259e4894-5be3-49e5-b58b-c9d77349b460",
+    "createdAt": "2025-01-27T23:45:16.5717738",
+    "cryptocurrency": {
+      "currentPrice": 101490.0,
+      "marketCap": 2.013509895087E12,
+      "volume24h": 8.4233207121E10,
+      "percentChange24h": -3.18731,
+      "lastUpdated": "2025-01-27T23:44:23.6140925",
+      "symbol": "BTC",
+      "name": "Bitcoin"
+    },
+    "transactionType": "BUY",
+    "amount": 0.2,
+    "costs": 0,
+    "fees": 0,
+    "id": "7ffe4f25-c0a1-4916-8288-72e695c23ada"
+  }
+]

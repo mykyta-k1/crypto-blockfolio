@@ -133,7 +133,7 @@ class TransactionServiceImpl extends GenericService<Transaction, UUID> implement
     }
 
     @Override
-    public void generateReport(Predicate<Transaction> filter) {
+    public void generateReport(Path savePath, Predicate<Transaction> filter) {
         // Генеруємо Excel-звіт про транзакції
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Transactions");

@@ -1,0 +1,24 @@
+[
+  {
+    "ownerId": "d92fe736-7878-4d54-9a8a-13bd3712e47a",
+    "createdAt": "2025-01-27T23:33:35.7583927",
+    "balances": {},
+    "transactionsList": [],
+    "totalValue": 0,
+    "name": "Test",
+    "id": "691da7d4-9608-46ac-9702-2104a6d1ca67"
+  },
+  {
+    "ownerId": "d92fe736-7878-4d54-9a8a-13bd3712e47a",
+    "createdAt": "2025-01-27T12:17:55.5487602",
+    "balances": {
+      "BTC": 0.2
+    },
+    "transactionsList": [
+      "7ffe4f25-c0a1-4916-8288-72e695c23ada"
+    ],
+    "totalValue": 20298.00,
+    "name": "N",
+    "id": "259e4894-5be3-49e5-b58b-c9d77349b460"
+  }
+]

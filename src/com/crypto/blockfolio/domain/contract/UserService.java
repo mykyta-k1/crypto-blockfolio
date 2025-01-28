@@ -35,5 +35,7 @@ public interface UserService extends Service<User, UUID>, Reportable<User> {
      * @return створений користувач {@link User}.
      */
     User add(UserAddDto userAddDto);
+
+    void update(User user);
 }
 

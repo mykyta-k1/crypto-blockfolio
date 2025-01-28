@@ -6,6 +6,10 @@ import com.crypto.blockfolio.presentation.ViewService;
 import java.util.Scanner;
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
+/**
+ * Клас {@code DashBoardView} представляє головне меню програми, яке забезпечує навігацію між
+ * основними функціями системи.
+ */
 public class DashBoardView implements ViewService {
 
     private final Scanner scanner;
@@ -16,25 +20,30 @@ public class DashBoardView implements ViewService {
         this.authService = ApplicationContext.getAuthService();
     }
 
+    /**
+     * Відображає головне меню програми та забезпечує навігацію до відповідних підменю. Перевіряє,
+     * чи користувач автентифікований, та перенаправляє до авторизації, якщо ні.
+     *
+     * @throws NotImplementedException якщо викликається недоступна функція.
+     */
     @Override
     public void display() throws NotImplementedException {
-        // Check if the user is authenticated
+
         if (!authService.isAuthenticated()) {
-            System.out.println(
-                "Користувач не авторизований. Переадресація на сторінку вибору дій.");
             RedirectView redirectView = new RedirectView();
             redirectView.display();
             return;
         }
 
         while (true) {
-            System.out.println("\n=== Головне меню ===");
-            System.out.println("[1] Криптовалюти");
-            System.out.println("[2] Портфоліо");
-            System.out.println("[3] Акаунт");
-            System.out.println("[4] Про програму");
-            System.out.println("[5] Вийти");
-            System.out.print("Оберіть дію: ");
+            System.out.println("\n🌟 ГОЛОВНЕ МЕНЮ 🌟");
+            System.out.println("━━━━━━━━━━━━━━━━━━");
+            System.out.println("1. 💰 Криптовалюти");
+            System.out.println("2. 📊 Портфоліо");
+            System.out.println("3. 👤 Особистий кабінет");
+            System.out.println("0. 🚪 Завершити роботу");
+            System.out.println("━━━━━━━━━━━━━━━━━━");
+            System.out.print("⭐ Оберіть опцію: ");
 
             String choice = scanner.nextLine();
             switch (choice) {
@@ -45,19 +54,17 @@ public class DashBoardView implements ViewService {
                 case "2" -> {
                     PortfolioView portfolioView = new PortfolioView();
                     portfolioView.display();
-                    System.out.println("Портфоліо сторінка");
                 }
                 case "3" -> {
                     AccountView accountView = new AccountView();
                     accountView.display();
                 }
-                case "4" -> System.out.println(
-                    "Blockfolio - Особистий криптопортфель для управління інвестиціями.");
-                case "5" -> {
-                    System.out.println("Дякуємо за використання Blockfolio! До побачення.");
+                case "0" -> {
+                    System.out.println("\n👋 Дякуємо, що користуєтесь Blockfolio!");
                     System.exit(0);
                 }
-                default -> System.err.println("Помилка: Невірний вибір. Спробуйте ще раз.");
+                default ->
+                    System.err.println("❌ Невірний вибір! Будь ласка, оберіть число від 0 до 3.");
             }
         }
     }

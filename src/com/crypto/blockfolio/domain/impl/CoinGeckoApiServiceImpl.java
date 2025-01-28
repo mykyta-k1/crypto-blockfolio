@@ -36,39 +36,66 @@ class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
     @Override
     public List<Cryptocurrency> getAllCryptocurrencies() {
         try {
+            // Спроба отримати дані з API
             List<Cryptocurrency> cryptocurrencies = fetchAllCryptocurrenciesFromApi();
+            if (cryptocurrencies.isEmpty()) {
+                throw new RuntimeException("API повернуло порожній список криптовалют.");
+            }
 
             // Збереження даних у репозиторій
             cryptocurrencies.forEach(cryptocurrencyRepository::add);
-
             return cryptocurrencies;
+
         } catch (Exception e) {
+            // Логування помилки API
             System.err.printf("Помилка запиту до API: %s%n", e.getMessage());
-            throw new RuntimeException("Не вдалося оновити дані криптовалют.");
+
+            // Використання даних із файлу
+            try {
+                List<Cryptocurrency> fallbackData = List.copyOf(cryptocurrencyRepository.findAll());
+                if (fallbackData.isEmpty()) {
+                    throw new RuntimeException("Дані з репозиторію недоступні.");
+                }
+                System.out.println("Дані завантажено з файлу.");
+                return fallbackData;
+
+            } catch (Exception fallbackException) {
+                System.err.printf("Помилка доступу до даних з файлу: %s%n",
+                    fallbackException.getMessage());
+                throw new RuntimeException("Не вдалося отримати дані ні з API, ні з файлу.");
+            }
         }
     }
+
 
     private List<Cryptocurrency> fetchAllCryptocurrenciesFromApi() throws Exception {
-        String endpoint = String.format("%s/coins/markets?vs_currency=usd", API_BASE_URL);
-        JsonArray jsonResponse = makeApiRequest(endpoint).getAsJsonArray();
+        try {
+            String endpoint = String.format("%s/coins/markets?vs_currency=usd", API_BASE_URL);
+            JsonArray jsonResponse = makeApiRequest(endpoint).getAsJsonArray();
 
-        List<Cryptocurrency> cryptocurrencies = new ArrayList<>();
-        for (JsonElement element : jsonResponse) {
-            JsonObject coinData = element.getAsJsonObject();
-            cryptocurrencies.add(new Cryptocurrency(
-                coinData.get("symbol").getAsString().toUpperCase(),
-                coinData.get("name").getAsString(),
-                coinData.get("current_price").getAsDouble(),
-                coinData.has("market_cap") ? coinData.get("market_cap").getAsDouble() : 0.0,
-                coinData.has("total_volume") ? coinData.get("total_volume").getAsDouble() : 0.0,
-                coinData.has("price_change_percentage_24h")
-                    ? coinData.get("price_change_percentage_24h").getAsDouble() : 0.0,
-                LocalDateTime.now()
-            ));
+            List<Cryptocurrency> cryptocurrencies = new ArrayList<>();
+            for (JsonElement element : jsonResponse) {
+                JsonObject coinData = element.getAsJsonObject();
+                cryptocurrencies.add(new Cryptocurrency(
+                    coinData.get("symbol").getAsString().toUpperCase(),
+                    coinData.get("name").getAsString(),
+                    coinData.get("current_price").getAsDouble(),
+                    coinData.has("market_cap") ? coinData.get("market_cap").getAsDouble() : 0.0,
+                    coinData.has("total_volume") ? coinData.get("total_volume").getAsDouble() : 0.0,
+                    coinData.has("price_change_percentage_24h")
+                        ? coinData.get("price_change_percentage_24h").getAsDouble() : 0.0,
+                    LocalDateTime.now()
+                ));
+            }
+
+            return cryptocurrencies;
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Не вдалося отримати дані від CoinGecko API. " + e.getMessage());
         }
-        // System.out.println(cryptocurrencies); Вивід відповіді АПІ
-        return cryptocurrencies;
     }
+
 
     private JsonElement makeApiRequest(String endpoint) throws Exception {
         //System.out.printf("Запит до API: %s%n", endpoint);
@@ -78,13 +105,16 @@ class CoinGeckoApiServiceImpl implements CoinGeckoApiService {
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Accept", "application/json");
 
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new RuntimeException("Не вдалося отримати дані від CoinGecko API. Код помилки: " +
-                connection.getResponseCode());
+        int responseCode = connection.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new RuntimeException(
+                "Не вдалося отримати дані від CoinGecko API" + endpoint + ". Код помилки: "
+                    + responseCode);
         }
 
         try (InputStreamReader reader = new InputStreamReader(connection.getInputStream())) {
             return GSON.fromJson(reader, JsonElement.class);
         }
     }
+
 }

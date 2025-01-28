@@ -20,8 +20,12 @@ public class TransactionsView {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Відображає інтерфейс для створення нової транзакції. Користувач може вибрати криптовалюту,
+     * тип транзакції, ввести кількість, витрати, комісію та додати опис перед підтвердженням
+     * транзакції.
+     */
     public void display() {
-        System.out.println("\n=== Створення транзакції ===");
         String selectedCrypto = null;
         TransactionType transactionType = null;
         BigDecimal amount = BigDecimal.ZERO;
@@ -30,22 +34,25 @@ public class TransactionsView {
         String description = null;
 
         while (true) {
-            System.out.println(
-                "\n[1] Криптовалюта: " + (selectedCrypto != null ? selectedCrypto : "Не вибрано"));
-            System.out.println("[2] Тип транзакції: " + (transactionType != null ? transactionType
-                : "Не вибрано"));
-            System.out.println("[3] Кількість: " + amount);
-            System.out.println("[4] Витрати: " + costs);
-            System.out.println("[5] Комісія: " + fees);
-            System.out.println("[6] Опис: " + (description != null ? description : "Не вказано"));
-            System.out.println("[7] Підтвердити та створити транзакцію");
-            System.out.println("[0] Повернутися назад");
-            System.out.print("Ваш вибір: ");
+            System.out.println("\n💱 СТВОРЕННЯ НОВОЇ ТРАНЗАКЦІЇ");
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.printf("1. 🪙 Криптовалюта: %s%n",
+                (selectedCrypto != null ? selectedCrypto : "❌ Не вибрано"));
+            System.out.printf("2. 📝 Тип операції: %s%n",
+                (transactionType != null ? transactionType : "❌ Не вибрано"));
+            System.out.printf("3. 💎 Кількість: %s%n", amount);
+            System.out.printf("4. 💰 Сума: %s USD%n", costs);
+            System.out.printf("5. 💸 Комісія: %s USD%n", fees);
+            System.out.printf("6. 📝 Коментар: %s%n",
+                (description != null ? description : "❌ Не вказано"));
+            System.out.println("7. ✅ Підтвердити транзакцію");
+            System.out.println("0. 🔙 Повернутися");
+            System.out.print("✨ Оберіть опцію: ");
             String input = scanner.nextLine().trim();
 
             switch (input) {
                 case "0":
-                    return; // Повернення до попереднього меню
+                    return;
                 case "1":
                     selectedCrypto = selectCryptocurrency();
                     break;
@@ -53,22 +60,22 @@ public class TransactionsView {
                     transactionType = selectTransactionType();
                     break;
                 case "3":
-                    amount = inputBigDecimal("Введіть кількість:");
+                    amount = inputBigDecimal("💎 Введіть кількість: ");
                     break;
                 case "4":
-                    costs = inputBigDecimal("Введіть витрати (сума операції):");
+                    costs = inputBigDecimal("💰 Введіть суму (USD): ");
                     break;
                 case "5":
-                    fees = inputBigDecimal("Введіть комісію:");
+                    fees = inputBigDecimal("💸 Введіть комісію (USD): ");
                     break;
                 case "6":
-                    System.out.print("Введіть опис: ");
+                    System.out.print("📝 Додайте коментар: ");
                     description = scanner.nextLine().trim();
                     break;
                 case "7":
                     if (selectedCrypto == null || transactionType == null
                         || amount.compareTo(BigDecimal.ZERO) <= 0) {
-                        System.out.println("Помилка: Усі обов'язкові поля мають бути заповнені.");
+                        System.out.println("⚠️ Заповніть усі обов'язкові поля");
                     } else {
                         createTransaction(selectedCrypto, transactionType, amount, costs, fees,
                             description);
@@ -76,41 +83,42 @@ public class TransactionsView {
                     }
                     break;
                 default:
-                    System.out.println("Невірний вибір. Спробуйте ще раз.");
+                    System.out.print("⚠️ Некоректний вибір. Спробуйте ще раз: ");
             }
         }
     }
 
-
     private String selectCryptocurrency() {
-        System.out.println("\nОберіть криптовалюту з портфеля:");
+        System.out.println("\n🪙 ОБЕРІТЬ КРИПТОВАЛЮТУ");
+        System.out.println("━━━━━━━━━━━━━━━━━━");
         List<String> cryptos = new ArrayList<>(portfolio.getBalances().keySet());
         for (int i = 0; i < cryptos.size(); i++) {
-            System.out.printf("[%d] %s%n", i + 1, cryptos.get(i));
+            System.out.printf("%d. 💎 %s%n", i + 1, cryptos.get(i));
         }
-        int choice = inputInt("Ваш вибір:");
+        int choice = inputInt("✨ Ваш вибір: ");
         if (choice > 0 && choice <= cryptos.size()) {
             return cryptos.get(choice - 1);
         } else {
-            System.out.println("Невірний вибір. Спробуйте ще раз.");
+            System.out.print("⚠️ Некоректний вибір. Спробуйте ще раз: ");
             return null;
         }
     }
 
     private TransactionType selectTransactionType() {
-        System.out.println("\nОберіть тип транзакції:");
-        System.out.println("[1] Купівля");
-        System.out.println("[2] Продаж");
-        System.out.println("[3] Поповнення");
-        System.out.println("[4] Виведення");
-        int choice = inputInt("Ваш вибір:");
+        System.out.println("\n📝 ТИП ТРАНЗАКЦІЇ");
+        System.out.println("━━━━━━━━━━━━━");
+        System.out.println("1. 📥 Купівля");
+        System.out.println("2. 📤 Продаж");
+        System.out.println("3. ⬇️ Поповнення");
+        System.out.println("4. ⬆️ Виведення");
+        int choice = inputInt("✨ Ваш вибір: ");
         return switch (choice) {
             case 1 -> TransactionType.BUY;
             case 2 -> TransactionType.SELL;
             case 3 -> TransactionType.TRANSFER_DEPOSIT;
             case 4 -> TransactionType.TRANSFER_WITHDRAWAL;
             default -> {
-                System.out.println("Невірний вибір. Спробуйте ще раз.");
+                System.out.print("⚠️ Некоректний вибір (1-4). Спробуйте ще раз: ");
                 yield null;
             }
         };
@@ -123,15 +131,15 @@ public class TransactionsView {
         switch (type) {
             case BUY, TRANSFER_DEPOSIT -> {
                 portfolio.getBalances().put(crypto, currentBalance.add(amount));
-                System.out.printf("Баланс криптовалюти %s збільшено на %.2f.%n", crypto, amount);
+                System.out.printf("✅ Баланс %s збільшено на %.4f%n", crypto, amount);
             }
             case SELL, TRANSFER_WITHDRAWAL -> {
                 if (currentBalance.compareTo(amount) < 0) {
-                    System.out.println("Помилка: Недостатньо балансу для цієї транзакції.");
+                    System.out.println("⚠️ Недостатньо коштів для проведення операції");
                     return;
                 }
                 portfolio.getBalances().put(crypto, currentBalance.subtract(amount));
-                System.out.printf("Баланс криптовалюти %s зменшено на %.2f.%n", crypto, amount);
+                System.out.printf("✅ Баланс %s зменшено на %.4f%n", crypto, amount);
             }
         }
 
@@ -149,7 +157,7 @@ public class TransactionsView {
         // Оновлення загальної вартості портфеля
         ApplicationContext.getPortfolioService().calculateTotalValue(portfolio);
         ApplicationContext.getTransactionService().addTransaction(transactionAddDto);
-        System.out.println("Транзакція успішно створена!");
+        System.out.println("✅ Транзакцію успішно створено!");
     }
 
     private BigDecimal inputBigDecimal(String prompt) {
@@ -158,7 +166,7 @@ public class TransactionsView {
             try {
                 return new BigDecimal(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.print("Некоректне число. Спробуйте ще раз: ");
+                System.out.print("⚠️ Некоректне значення. Спробуйте ще раз: ");
             }
         }
     }
@@ -169,7 +177,7 @@ public class TransactionsView {
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.print("Некоректне число. Спробуйте ще раз: ");
+                System.out.print("⚠️ Некоректне значення. Спробуйте ще раз: ");
             }
         }
     }

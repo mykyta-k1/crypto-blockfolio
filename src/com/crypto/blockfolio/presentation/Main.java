@@ -6,7 +6,7 @@ import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 /**
  * Головний клас програми. Відповідає за ініціалізацію контексту застосунку та запуск головного
- * інтерфейсу користувача (панелі приладів).
+ * інтерфейсу користувача (DashBoard).
  */
 public class Main {
 
@@ -19,7 +19,8 @@ public class Main {
     public static void main(String[] args) throws NotImplementedException {
         // Ініціалізація контексту застосунку
         ApplicationContext applicationContext = ApplicationContext.getInstance();
-        // Відображення головної панелі приладів
+        //applicationContext.initializeCryptocurrencies();
+        // Відображення головної панелі
         DashBoardView dashBoardView = new DashBoardView();
         dashBoardView.display();
     }
