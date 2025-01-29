@@ -1,24 +1,46 @@
 [
   {
     "ownerId": "d92fe736-7878-4d54-9a8a-13bd3712e47a",
-    "createdAt": "2025-01-27T23:33:35.7583927",
-    "balances": {},
-    "transactionsList": [],
-    "totalValue": 0,
-    "name": "Test",
-    "id": "691da7d4-9608-46ac-9702-2104a6d1ca67"
-  },
-  {
-    "ownerId": "d92fe736-7878-4d54-9a8a-13bd3712e47a",
-    "createdAt": "2025-01-27T12:17:55.5487602",
+    "createdAt": "2025-01-28T22:13:37.8409767",
     "balances": {
-      "BTC": 0.2
+      "IMX": 430,
+      "BTC": 0.5
     },
     "transactionsList": [
-      "7ffe4f25-c0a1-4916-8288-72e695c23ada"
+      "9253ed9d-ff5a-4494-96e6-eb81ec03f398",
+      "5d48e654-d5a3-45c8-bdd6-789fa5bb5b63"
     ],
-    "totalValue": 20298.00,
-    "name": "N",
-    "id": "259e4894-5be3-49e5-b58b-c9d77349b460"
+    "totalValue": 51469.13,
+    "name": "Main Portfolio",
+    "id": "5e06cffa-8ac4-4741-af34-4a68fc0675e3"
+  },
+  {
+    "ownerId": "f71d6b50-3f4d-4f09-befa-8c7a657a9e24",
+    "createdAt": "2025-01-29T10:15:22.1125674",
+    "balances": {
+      "ETH": 2.3,
+      "XRP": 500
+    },
+    "transactionsList": [
+      "b12a3f45-2c9f-4034-97db-76d31b16e3a7",
+      "9cd51ab6-0e73-467d-899c-243b5f497a9b"
+    ],
+    "totalValue": 8720.85,
+    "name": "Investment Portfolio",
+    "id": "aa84f9dc-21b2-4e6e-9082-5f4e34a5a317"
+  },
+  {
+    "ownerId": "c8312a8b-1c22-4d7a-94b1-2f9b7f4c60d3",
+    "createdAt": "2025-01-30T15:45:12.3456789",
+    "balances": {
+      "USDT": 1500,
+      "XCN": 20000
+    },
+    "transactionsList": [
+      "3e2f65ac-54cb-4e6d-a122-fb27f1ad3c11"
+    ],
+    "totalValue": 1512.98,
+    "name": "Stable Portfolio",
+    "id": "4fa8b64e-3c8a-4c7f-a0b6-8e2f34567abc"
   }
 ]

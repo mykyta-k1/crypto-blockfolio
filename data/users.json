@@ -5,9 +5,28 @@
     "username": "Mykyta",
     "email": "c.kryvobokov.mykyta@student.uzhnu.edu.ua",
     "portfolios": [
-      "259e4894-5be3-49e5-b58b-c9d77349b460",
-      "691da7d4-9608-46ac-9702-2104a6d1ca67"
+      "5e06cffa-8ac4-4741-af34-4a68fc0675e3"
     ],
     "id": "d92fe736-7878-4d54-9a8a-13bd3712e47a"
+  },
+  {
+    "password": "$2a$10$LJmPZ3tR06WdXejVYrR2We34vBFYl5c9yUcfU6hJZ.Jft/U.CFQDa",
+    "createdAt": "2025-01-29T09:10:12.645321",
+    "username": "Anna",
+    "email": "anna.krypto.trader@mail.com",
+    "portfolios": [
+      "aa84f9dc-21b2-4e6e-9082-5f4e34a5a317"
+    ],
+    "id": "f71d6b50-3f4d-4f09-befa-8c7a657a9e24"
+  },
+  {
+    "password": "$2a$10$EjXdfgA4fd0f9SDFjle.XKDfL4sdGvXlVhXPogFjzq21/UrJbopAe",
+    "createdAt": "2025-01-30T14:30:45.678901",
+    "username": "Max",
+    "email": "max.cryptoinvestor@mail.com",
+    "portfolios": [
+      "4fa8b64e-3c8a-4c7f-a0b6-8e2f34567abc"
+    ],
+    "id": "c8312a8b-1c22-4d7a-94b1-2f9b7f4c60d3"
   }
 ]

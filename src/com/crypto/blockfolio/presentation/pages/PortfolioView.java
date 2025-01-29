@@ -72,6 +72,7 @@ public class PortfolioView implements ViewService {
             System.out.println("━━━━━━━━━━━━━━━");
             System.out.println("0. 🔙 Повернутися");
             System.out.println("➕ Створити новий портфель");
+            System.out.println("➖ Видалити портфель");
 
             User currentUser = authService.getUser();
             List<Portfolio> portfolios = loadUserPortfolios(currentUser);
@@ -96,6 +97,8 @@ public class PortfolioView implements ViewService {
                 return;
             } else if (input.equals("+")) {
                 createPortfolio(currentUser);
+            } else if (input.equals("-")) {
+                deletePortfolio(currentUser);
             } else {
                 try {
                     int selectedIndex = Integer.parseInt(input) - 1;
@@ -114,6 +117,85 @@ public class PortfolioView implements ViewService {
             }
         }
     }
+
+    /**
+     * Видаляє портфель користувача, запитуючи підтвердження перед видаленням.
+     *
+     * @param currentUser поточний автентифікований користувач.
+     */
+    private void deletePortfolio(User currentUser) {
+        List<Portfolio> portfolios = loadUserPortfolios(currentUser);
+
+        if (portfolios.isEmpty()) {
+            System.out.println("⚠️ У вас немає портфелів для видалення.");
+            return;
+        }
+
+        System.out.println("\n❌ ВИДАЛЕННЯ ПОРТФЕЛЯ");
+        System.out.println("━━━━━━━━━━━━━━━━━━━");
+
+        for (int i = 0; i < portfolios.size(); i++) {
+            System.out.printf("%d. 💼 %s 💰 Вартість: $%.2f%n",
+                i + 1,
+                portfolios.get(i).getName(),
+                portfolios.get(i).getTotalValue());
+        }
+
+        System.out.print(
+            "\uD83D\uDDD1\uFE0F Оберіть номер портфеля для видалення (0 - скасувати): ");
+        String input = scanner.nextLine().trim();
+
+        try {
+            int selectedIndex = Integer.parseInt(input) - 1;
+
+            if (selectedIndex == -1) {
+                System.out.println("❌ Видалення скасовано.");
+                return;
+            }
+
+            if (selectedIndex >= 0 && selectedIndex < portfolios.size()) {
+                Portfolio portfolioToDelete = portfolios.get(selectedIndex);
+
+                System.out.printf("⚠️ Ви дійсно хочете видалити портфель '%s'? (y/n): ",
+                    portfolioToDelete.getName());
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+
+                if (!confirmation.equals("y")) {
+                    System.out.println("❌ Видалення скасовано.");
+                    return;
+                }
+
+                // Отримання списку транзакцій, пов'язаних із портфелем, та приведення Set до List
+                List<UUID> transactionIds = new ArrayList<>(
+                    portfolioToDelete.getTransactionsList());
+
+                if (!transactionIds.isEmpty()) {
+                    for (UUID transactionId : transactionIds) {
+                        try {
+                            ApplicationContext.getTransactionService()
+                                .deleteTransaction(transactionId);
+                        } catch (Exception e) {
+                            System.err.printf("⚠️ Помилка видалення транзакції %s: %s%n",
+                                transactionId, e.getMessage());
+                        }
+                    }
+                }
+
+                // Видалення портфеля
+                portfolioService.deletePortfolio(portfolioToDelete.getId());
+                currentUser.getPortfolios().remove(portfolioToDelete.getId());
+                authService.updateUser(currentUser);
+
+                System.out.printf("✅ Портфель '%s' успішно видалено.%n",
+                    portfolioToDelete.getName());
+            } else {
+                System.out.println("⚠️ Помилка: Невірний вибір. Спробуйте ще раз.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("⚠️ Помилка: Введіть коректний номер портфеля.");
+        }
+    }
+
 
     private List<Cryptocurrency> readCryptocurrenciesFromFile() {
         return new ArrayList<>(cryptocurrencyRepository.findAll());

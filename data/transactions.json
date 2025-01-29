@@ -1,20 +1,56 @@
 [
   {
-    "portfolioId": "259e4894-5be3-49e5-b58b-c9d77349b460",
-    "createdAt": "2025-01-27T23:45:16.5717738",
+    "portfolioId": "5e06cffa-8ac4-4741-af34-4a68fc0675e3",
+    "createdAt": "2025-01-28T23:28:55.2586731",
     "cryptocurrency": {
-      "currentPrice": 101490.0,
-      "marketCap": 2.013509895087E12,
-      "volume24h": 8.4233207121E10,
-      "percentChange24h": -3.18731,
-      "lastUpdated": "2025-01-27T23:44:23.6140925",
-      "symbol": "BTC",
-      "name": "Bitcoin"
+      "currentPrice": 1.091,
+      "marketCap": 1.903938193E9,
+      "volume24h": 4.3827108E7,
+      "percentChange24h": -8.28945,
+      "lastUpdated": "2025-01-28T23:28:05.5616144",
+      "symbol": "IMX",
+      "name": "Immutable"
     },
-    "transactionType": "BUY",
-    "amount": 0.2,
+    "transactionType": "TRANSFER_DEPOSIT",
+    "amount": 430,
     "costs": 0,
     "fees": 0,
-    "id": "7ffe4f25-c0a1-4916-8288-72e695c23ada"
+    "id": "9253ed9d-ff5a-4494-96e6-eb81ec03f398"
+  },
+  {
+    "portfolioId": "aa84f9dc-21b2-4e6e-9082-5f4e34a5a317",
+    "createdAt": "2025-01-29T10:20:35.8764321",
+    "cryptocurrency": {
+      "currentPrice": 3134.45,
+      "marketCap": 3.77483678952E11,
+      "volume24h": 1.8981469932E10,
+      "percentChange24h": -1.91493,
+      "lastUpdated": "2025-01-29T13:05:15.979094",
+      "symbol": "ETH",
+      "name": "Ethereum"
+    },
+    "transactionType": "BUY",
+    "amount": 2.3,
+    "costs": 7200,
+    "fees": 30,
+    "id": "b12a3f45-2c9f-4034-97db-76d31b16e3a7"
+  },
+  {
+    "portfolioId": "4fa8b64e-3c8a-4c7f-a0b6-8e2f34567abc",
+    "createdAt": "2025-01-30T16:00:22.9876543",
+    "cryptocurrency": {
+      "currentPrice": 0.03649456,
+      "marketCap": 1.165587019E9,
+      "volume24h": 1.09275731E9,
+      "percentChange24h": -21.79716,
+      "lastUpdated": "2025-01-30T16:00:00.1234567",
+      "symbol": "XCN",
+      "name": "Onyxcoin"
+    },
+    "transactionType": "BUY",
+    "amount": 20000,
+    "costs": 750,
+    "fees": 5,
+    "id": "3e2f65ac-54cb-4e6d-a122-fb27f1ad3c11"
   }
 ]

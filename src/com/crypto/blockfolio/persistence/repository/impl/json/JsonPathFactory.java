@@ -1,5 +1,7 @@
 package com.crypto.blockfolio.persistence.repository.impl.json;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -53,7 +55,17 @@ enum JsonPathFactory {
      * @return об'єкт {@link Path}, що представляє шлях до файлу.
      */
     public Path getPath() {
-        return Path.of(DATA_DIRECTORY, this.fileName);
+        Path directory = Path.of(DATA_DIRECTORY);
+
+        if (Files.notExists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw new RuntimeException("Не вдалося створити директорію: " + DATA_DIRECTORY, e);
+            }
+        }
+
+        return directory.resolve(this.fileName);
     }
 }
 

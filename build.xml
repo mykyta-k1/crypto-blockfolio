@@ -1,0 +1,62 @@
+<project basedir="." default="fatjar" name="Blockfolio">
+
+  <!-- Оголошення змінних -->
+  <property name="src.dir" value="src"/>
+  <property name="build.dir" value="out"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="lib.dir" value="libs"/>
+
+  <!-- Очистка старих збірок -->
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <!-- Створення папок після clean -->
+  <target name="init">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+  <!-- Компіляція Java-коду -->
+  <target depends="clean,init" name="compile">
+    <echo message="✅ Компілікація завершена!"/>
+    <javac destdir="${build.dir}" nowarn="false" srcdir="${src.dir}">
+      <classpath>
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+      </classpath>
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+  </target>
+
+  <!-- Створення JAR-файлу -->
+  <target depends="compile" name="jar">
+    <echo message="✅ JAR-файл створено!"/>
+    <jar destfile="${dist.dir}/Blockfolio.jar">
+      <fileset dir="${build.dir}"/>
+
+      <manifest>
+        <attribute name="Main-Class" value="com.crypto.blockfolio.presentation.Main"/>
+        <attribute name="Class-Path" value="libs/"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- Фінальна збірка (fat JAR) -->
+  <target depends="compile" name="fatjar">
+    <echo message="✅ Fat JAR створено! Запуск: java -jar dist/Blockfolio-fat.jar"/>
+
+    <jar destfile="${dist.dir}/Blockfolio-fat.jar">
+      <fileset dir="${build.dir}"/>
+
+      <!-- Включаємо всі JAR-файли -->
+      <manifest>
+        <attribute name="Main-Class" value="com.crypto.blockfolio.presentation.Main"/>
+      </manifest>
+
+      <zipgroupfileset dir="${lib.dir}" includes="**/*.jar"/>
+    </jar>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+</project>

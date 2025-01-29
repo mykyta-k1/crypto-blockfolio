@@ -39,17 +39,17 @@ public class AccountView implements ViewService {
             User currentUser = authService.getUser();
 
             while (true) {
-                System.out.println("\n=== Інформація про акаунт ===");
-                System.out.println("Email: " + currentUser.getEmail());
-                System.out.println("Нікнейм: " + currentUser.getUsername());
-                System.out.println("Дата створення: " + currentUser.getCreatedAt());
-                System.out.println("\n[1] Змінити нікнейм");
-                System.out.println("[2] Змінити email");
-                System.out.println("[3] Генерувати звіт");
-                System.out.println("[4] Вийти з акаунту");
-                System.out.println("[0] Повернутися назад");
+                System.out.println("\n=== 🛠️ Інформація про акаунт ===");
+                System.out.println("📧 Email: " + currentUser.getEmail());
+                System.out.println("👤 Нікнейм: " + currentUser.getUsername());
+                System.out.println("📅 Дата створення: " + currentUser.getCreatedAt());
+                System.out.println("\n1 👤 Змінити нікнейм");
+                System.out.println("2. 📧 Змінити email");
+                System.out.println("3. \uD83D\uDCC4 Генерувати звіт");
+                System.out.println("4. \uD83D\uDD12 Вийти з акаунту");
+                System.out.println("0. \uD83D\uDD19 Повернутися назад");
 
-                System.out.print("Ваш вибір: ");
+                System.out.print("✨ Оберіть опцію: ");
                 String choice = scanner.nextLine();
 
                 switch (choice) {
